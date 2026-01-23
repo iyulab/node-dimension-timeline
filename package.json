@@ -1,0 +1,60 @@
+{
+  "name": "@iyulab/dimension-timeline",
+  "description": "A timeline component for visualizing tasks across customizable dimensions with collision-aware layout",
+  "version": "0.1.0",
+  "keywords": [
+    "iyulab",
+    "timeline",
+    "dimension",
+    "gantt",
+    "scheduler",
+    "web-components",
+    "lit",
+    "canvas"
+  ],
+  "license": "MIT",
+  "author": "iyulab",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iyulab/dimension-timeline.git"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "package.json"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./dist/*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*"
+    }
+  },
+  "scripts": {
+    "start": "vite --force",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@iyulab/components": "^0.2.0",
+    "lit": "^3.3.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.0.9",
+    "eslint": "^9.39.2",
+    "eslint-plugin-lit": "^2.1.1",
+    "globals": "^17.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.0",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  }
+}

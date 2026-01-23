@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dimension Timeline Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f1f5f9;
+      padding: 24px;
+    }
+
+    h1 {
+      margin-bottom: 16px;
+      color: #1e293b;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-group label {
+      font-size: 14px;
+      color: #475569;
+    }
+
+    select, button, input {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    select:hover, button:hover {
+      border-color: #94a3b8;
+    }
+
+    button {
+      background: #3b82f6;
+      color: #ffffff;
+      border-color: #3b82f6;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    button.secondary {
+      background: #64748b;
+      border-color: #64748b;
+    }
+
+    button.secondary:hover {
+      background: #475569;
+    }
+
+    button.danger {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    button.danger:hover {
+      background: #dc2626;
+    }
+
+    .timeline-container {
+      height: 600px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats {
+      margin-top: 16px;
+      padding: 12px;
+      background: #ffffff;
+      border-radius: 8px;
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+    }
+
+    .stat-item {
+      display: flex;
+      gap: 8px;
+    }
+
+    .stat-label {
+      color: #64748b;
+    }
+
+    .stat-value {
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .event-log {
+      margin-top: 16px;
+      padding: 12px;
+      background: #1e293b;
+      border-radius: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .event-log h3 {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .log-entry {
+      font-family: monospace;
+      font-size: 12px;
+      color: #e2e8f0;
+      padding: 2px 0;
+    }
+
+    .log-entry .timestamp {
+      color: #64748b;
+      margin-right: 8px;
+    }
+
+    .log-entry .event-name {
+      color: #22d3ee;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dimension Timeline Demo</h1>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Scale:</label>
+      <select id="scale-select">
+        <option value="10min">10분</option>
+        <option value="hour" selected>시간</option>
+        <option value="day">일</option>
+        <option value="week">주</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label>Dimension:</label>
+      <select id="dimension-select">
+        <option value="project">프로젝트</option>
+        <option value="worker">작업자</option>
+        <option value="equipment">장비</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <button id="today-btn">오늘로 이동</button>
+      <button id="generate-btn">샘플 데이터 생성</button>
+      <button id="relocate-btn" class="secondary">랜덤 재배치</button>
+      <button id="clear-btn" class="danger">전체 삭제</button>
+    </div>
+
+    <div class="control-group">
+      <label>Task 수:</label>
+      <input type="number" id="task-count" value="500" min="100" max="5000" style="width: 80px;">
+    </div>
+  </div>
+
+  <div class="timeline-container">
+    <d-dimension-timeline id="timeline"></d-dimension-timeline>
+  </div>
+
+  <div class="stats">
+    <div class="stat-item">
+      <span class="stat-label">Tasks:</span>
+      <span class="stat-value" id="stat-tasks">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Projects:</span>
+      <span class="stat-value" id="stat-projects">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Workers:</span>
+      <span class="stat-value" id="stat-workers">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Equipment:</span>
+      <span class="stat-value" id="stat-equipment">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Render Time:</span>
+      <span class="stat-value" id="stat-render">-</span>
+    </div>
+  </div>
+
+  <div class="event-log">
+    <h3>Event Log</h3>
+    <div id="log-container"></div>
+  </div>
+
+  <script type="module">
+    import { DimensionTimeline, ArrayDataSource } from '../src/index.js';
+
+    // 요소 참조
+    const timeline = document.getElementById('timeline');
+    const scaleSelect = document.getElementById('scale-select');
+    const dimensionSelect = document.getElementById('dimension-select');
+    const todayBtn = document.getElementById('today-btn');
+    const generateBtn = document.getElementById('generate-btn');
+    const relocateBtn = document.getElementById('relocate-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const taskCountInput = document.getElementById('task-count');
+    const logContainer = document.getElementById('log-container');
+
+    // 통계 요소
+    const statTasks = document.getElementById('stat-tasks');
+    const statProjects = document.getElementById('stat-projects');
+    const statWorkers = document.getElementById('stat-workers');
+    const statEquipment = document.getElementById('stat-equipment');
+    const statRender = document.getElementById('stat-render');
+
+    // 프로젝트 정의 (20개)
+    const projects = Array.from({ length: 20 }, (_, i) => ({
+      key: `project-${i + 1}`,
+      label: `프로젝트 ${String.fromCharCode(65 + (i % 26))}${i >= 26 ? Math.floor(i / 26) : ''}`,
+      color: `hsl(${(i * 18) % 360}, 65%, 55%)`,
+    }));
+
+    // 작업자 정의 (15명)
+    const workers = [
+      { key: 'kim', label: '김철수', color: '#3b82f6' },
+      { key: 'lee', label: '이영희', color: '#10b981' },
+      { key: 'park', label: '박민수', color: '#f59e0b' },
+      { key: 'choi', label: '최수진', color: '#ec4899' },
+      { key: 'jung', label: '정민호', color: '#8b5cf6' },
+      { key: 'kang', label: '강지현', color: '#06b6d4' },
+      { key: 'yoon', label: '윤서연', color: '#ef4444' },
+      { key: 'han', label: '한동훈', color: '#84cc16' },
+      { key: 'oh', label: '오민지', color: '#f97316' },
+      { key: 'seo', label: '서준혁', color: '#14b8a6' },
+      { key: 'jang', label: '장미란', color: '#a855f7' },
+      { key: 'lim', label: '임성훈', color: '#eab308' },
+      { key: 'song', label: '송유리', color: '#22c55e' },
+      { key: 'hwang', label: '황재민', color: '#0ea5e9' },
+      { key: 'ahn', label: '안소희', color: '#d946ef' },
+    ];
+
+    // 장비 정의 (10개)
+    const equipments = [
+      { key: 'cnc-1', label: 'CNC 가공기 #1', color: '#3b82f6' },
+      { key: 'cnc-2', label: 'CNC 가공기 #2', color: '#3b82f6' },
+      { key: 'laser-1', label: '레이저 커터 #1', color: '#ef4444' },
+      { key: 'laser-2', label: '레이저 커터 #2', color: '#ef4444' },
+      { key: 'press-1', label: '프레스기 #1', color: '#10b981' },
+      { key: 'press-2', label: '프레스기 #2', color: '#10b981' },
+      { key: 'weld-1', label: '용접기 #1', color: '#f59e0b' },
+      { key: 'weld-2', label: '용접기 #2', color: '#f59e0b' },
+      { key: 'assembly', label: '조립 라인', color: '#8b5cf6' },
+      { key: 'inspection', label: '검수대', color: '#06b6d4' },
+    ];
+
+    // Dimensions 정의
+    const dimensions = [
+      { key: 'project', label: '프로젝트', values: projects },
+      { key: 'worker', label: '작업자', values: workers },
+      { key: 'equipment', label: '장비', values: equipments },
+    ];
+
+    // 타임 영역 정의 (근무 시간대)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const timeRegions = [];
+    // 7일간의 근무 시간대 추가
+    for (let d = -3; d <= 7; d++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + d);
+
+      // 주말인지 확인
+      const dayOfWeek = date.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        // 주말 - 전체를 휴일로
+        timeRegions.push({
+          id: `weekend-${d}`,
+          start: new Date(date),
+          end: new Date(date.getTime() + 24 * 60 * 60 * 1000),
+          label: dayOfWeek === 0 ? '일요일' : '토요일',
+          type: 'holiday',
+          color: '#f87171',
+          opacity: 0.1,
+        });
+      } else {
+        // 평일 - 점심시간
+        const lunchStart = new Date(date);
+        lunchStart.setHours(12, 0, 0, 0);
+        const lunchEnd = new Date(date);
+        lunchEnd.setHours(13, 0, 0, 0);
+
+        timeRegions.push({
+          id: `lunch-${d}`,
+          start: lunchStart,
+          end: lunchEnd,
+          label: '점심',
+          type: 'break',
+          color: '#fbbf24',
+          opacity: 0.15,
+        });
+      }
+    }
+
+    // DataSource 생성
+    const dataSource = new ArrayDataSource([]);
+
+    // 샘플 데이터 생성 함수
+    function generateSampleData(count) {
+      const tasks = [];
+      const now = Date.now();
+      const dayMs = 24 * 60 * 60 * 1000;
+      const hourMs = 60 * 60 * 1000;
+
+      // 프로젝트별로 태스크 분배
+      const tasksPerProject = Math.ceil(count / projects.length);
+
+      for (let p = 0; p < projects.length; p++) {
+        const project = projects[p];
+        const projectTaskCount = Math.min(
+          tasksPerProject + Math.floor(Math.random() * 20) - 10,
+          count - tasks.length
+        );
+
+        // 프로젝트 시작일 (과거 3일 ~ 미래 7일 사이)
+        const projectStartOffset = (Math.random() * 10 - 3) * dayMs;
+
+        for (let t = 0; t < projectTaskCount && tasks.length < count; t++) {
+          // Task 시작 시간 (프로젝트 시작일 기준)
+          const startOffset = projectStartOffset + Math.random() * 7 * dayMs;
+          const start = new Date(now + startOffset);
+
+          // 근무 시간 내로 조정 (8:00 ~ 18:00)
+          start.setHours(8 + Math.floor(Math.random() * 9), Math.floor(Math.random() * 6) * 10, 0, 0);
+
+          // 기간: 30분 ~ 5시간
+          const durationHours = 0.5 + Math.random() * 4.5;
+          const end = new Date(start.getTime() + durationHours * hourMs);
+
+          // 랜덤 작업자와 장비 할당
+          const worker = workers[Math.floor(Math.random() * workers.length)];
+          const equipment = equipments[Math.floor(Math.random() * equipments.length)];
+
+          // Task 유형
+          const taskTypes = ['가공', '조립', '검수', '용접', '도장', '포장', '설계', '테스트'];
+          const taskType = taskTypes[Math.floor(Math.random() * taskTypes.length)];
+
+          tasks.push({
+            id: `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            start,
+            end,
+            dimensions: {
+              project: project.key,
+              worker: worker.key,
+              equipment: equipment.key,
+            },
+            label: `${taskType} #${tasks.length + 1}`,
+            color: project.color,
+            status: ['pending', 'in-progress', 'completed'][Math.floor(Math.random() * 3)],
+            progress: Math.floor(Math.random() * 101),
+          });
+        }
+      }
+
+      return tasks;
+    }
+
+    // 랜덤 재배치 함수
+    async function randomRelocate() {
+      const startTime = performance.now();
+      const result = await dataSource.query();
+      const tasks = result.tasks;
+
+      const now = Date.now();
+      const dayMs = 24 * 60 * 60 * 1000;
+      const hourMs = 60 * 60 * 1000;
+
+      // 일괄 업데이트
+      const updates = tasks.map(task => {
+        const startOffset = (Math.random() * 10 - 3) * dayMs;
+        const start = new Date(now + startOffset);
+        start.setHours(8 + Math.floor(Math.random() * 9), Math.floor(Math.random() * 6) * 10, 0, 0);
+
+        const duration = task.end.getTime() - task.start.getTime();
+        const end = new Date(start.getTime() + duration);
+
+        return { id: task.id, start, end };
+      });
+
+      // 순차 업데이트 (성능 테스트)
+      for (const update of updates) {
+        await dataSource.update(update.id, { start: update.start, end: update.end });
+      }
+
+      await timeline.refresh();
+
+      const renderTime = performance.now() - startTime;
+      statRender.textContent = `${renderTime.toFixed(1)}ms`;
+      log('random-relocate', { count: tasks.length, time: renderTime.toFixed(1) + 'ms' });
+    }
+
+    // 통계 업데이트
+    function updateStats() {
+      dataSource.query().then(result => {
+        statTasks.textContent = result.tasks.length;
+
+        const projectSet = new Set();
+        const workerSet = new Set();
+        const equipmentSet = new Set();
+
+        for (const task of result.tasks) {
+          if (task.dimensions.project) projectSet.add(task.dimensions.project);
+          if (task.dimensions.worker) workerSet.add(task.dimensions.worker);
+          if (task.dimensions.equipment) equipmentSet.add(task.dimensions.equipment);
+        }
+
+        statProjects.textContent = projectSet.size;
+        statWorkers.textContent = workerSet.size;
+        statEquipment.textContent = equipmentSet.size;
+      });
+    }
+
+    // Timeline 초기화
+    timeline.dataSource = dataSource;
+    timeline.dimensions = dimensions;
+    timeline.activeDimension = 'project';
+    timeline.scale = 'hour';
+    timeline.timeRegions = timeRegions;
+    timeline.realtimeInterval = 60000; // 1분마다 현재시간 마커 업데이트
+
+    // 이벤트 로깅
+    function log(eventName, detail) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+
+      const time = new Date().toLocaleTimeString();
+      const detailStr = detail ? ` - ${JSON.stringify(detail).substring(0, 100)}` : '';
+      entry.innerHTML = `<span class="timestamp">${time}</span><span class="event-name">${eventName}</span>${detailStr}`;
+
+      logContainer.insertBefore(entry, logContainer.firstChild);
+
+      // 최대 30개 로그 유지
+      while (logContainer.children.length > 30) {
+        logContainer.removeChild(logContainer.lastChild);
+      }
+    }
+
+    // 이벤트 리스너
+    timeline.addEventListener('timeline-task-select', (e) => {
+      log('task-select', { id: e.detail.task?.id, label: e.detail.task?.label });
+    });
+
+    timeline.addEventListener('timeline-task-move', (e) => {
+      log('task-move', { id: e.detail.task?.id });
+    });
+
+    timeline.addEventListener('timeline-task-resize', (e) => {
+      log('task-resize', { id: e.detail.task?.id, edge: e.detail.edge });
+    });
+
+    timeline.addEventListener('timeline-dimension-change', (e) => {
+      log('dimension-change', e.detail);
+    });
+
+    // 컨트롤 이벤트
+    scaleSelect.addEventListener('change', () => {
+      timeline.scale = scaleSelect.value;
+    });
+
+    dimensionSelect.addEventListener('change', () => {
+      timeline.activeDimension = dimensionSelect.value;
+    });
+
+    todayBtn.addEventListener('click', () => {
+      timeline.scrollToDate(new Date(), 'center');
+    });
+
+    generateBtn.addEventListener('click', async () => {
+      const count = parseInt(taskCountInput.value) || 500;
+      const startTime = performance.now();
+
+      const tasks = generateSampleData(count);
+      await dataSource.setAll(tasks);
+      await timeline.refresh();
+
+      const renderTime = performance.now() - startTime;
+      statRender.textContent = `${renderTime.toFixed(1)}ms`;
+
+      updateStats();
+      log('generate', { count: tasks.length, time: renderTime.toFixed(1) + 'ms' });
+    });
+
+    relocateBtn.addEventListener('click', randomRelocate);
+
+    clearBtn.addEventListener('click', async () => {
+      await dataSource.setAll([]);
+      await timeline.refresh();
+      updateStats();
+      log('clear', {});
+    });
+
+    // 초기 데이터 생성
+    const initialTasks = generateSampleData(500);
+    dataSource.setAll(initialTasks).then(() => {
+      timeline.refresh();
+      updateStats();
+
+      // 오늘로 스크롤
+      setTimeout(() => {
+        timeline.scrollToDate(new Date(), 'center');
+      }, 100);
+    });
+  </script>
+</body>
+</html>
