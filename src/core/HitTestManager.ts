@@ -81,14 +81,20 @@ export class HitTestManager<T = unknown> {
 
   /**
    * 히트 테스트 수행
+   * @param x 뷰포트 X 좌표
+   * @param y 뷰포트 Y 좌표
+   * @param scrollX X 스크롤 오프셋
+   * @param scrollY Y 스크롤 오프셋
    */
-  hitTest(x: number, y: number, scrollY: number): HitTestResult<T> {
+  hitTest(x: number, y: number, scrollX: number, scrollY: number): HitTestResult<T> {
+    // 뷰포트 좌표를 절대 좌표로 변환
+    const adjustedX = x + scrollX;
     const adjustedY = y + scrollY;
 
-    // X 범위에 해당하는 Task들 조회
+    // X 범위에 해당하는 Task들 조회 (절대 좌표 사용)
     const candidates = this.xIntervalTree.query({
-      start: x - this.options.hitPadding,
-      end: x + this.options.hitPadding,
+      start: adjustedX - this.options.hitPadding,
+      end: adjustedX + this.options.hitPadding,
     });
 
     // Y 좌표도 확인하여 실제 히트된 Task 찾기
@@ -98,8 +104,8 @@ export class HitTestManager<T = unknown> {
 
       if (adjustedY >= absoluteY - this.options.hitPadding &&
           adjustedY <= absoluteY + layoutedTask.height + this.options.hitPadding) {
-        // 히트됨 - 영역 판별
-        const area = this.determineHitArea(x, layoutedTask);
+        // 히트됨 - 영역 판별 (절대 좌표로 판별)
+        const area = this.determineHitArea(adjustedX, layoutedTask);
 
         return {
           task: layoutedTask.task,

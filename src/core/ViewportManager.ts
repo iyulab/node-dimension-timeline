@@ -10,9 +10,11 @@ import { TimeScale } from './TimeScale.js';
  * 뷰포트 변경 이벤트
  */
 export interface ViewportChangeEvent {
-  type: 'zoom' | 'pan' | 'scroll' | 'resize' | 'scale-change';
+  type: 'zoom' | 'pan' | 'scroll' | 'resize' | 'scale-change' | 'boundary-reached' | 'overscroll-bounce';
   viewport: ViewportState;
   scale: TimeScaleUnit;
+  /** 경계 도달 방향 */
+  boundaryDirection?: 'left' | 'right' | 'top' | 'bottom';
 }
 
 /**
@@ -66,6 +68,18 @@ export class ViewportManager {
   private panStartY: number = 0;
   private panStartScrollX: number = 0;
   private panStartScrollY: number = 0;
+
+  // Overscroll 상태
+  private _overscrollY: number = 0;
+  private overscrollBounceAnimation: number | null = null;
+
+  // 콘텐츠 크기 (경계 체크용)
+  private _contentHeight: number = 0;
+  private _contentMinX: number = 0;
+  private _contentMaxX: number = 0;
+
+  // 경계 도달 쿨다운 (중복 이벤트 방지)
+  private boundaryReachedCooldown: Map<string, number> = new Map();
 
   constructor(config: ViewportManagerConfig = {}) {
     this.config = {
@@ -362,6 +376,122 @@ export class ViewportManager {
     return this.isPanning;
   }
 
+  /**
+   * Overscroll Y 값 (음수: 위로 벗어남)
+   */
+  get overscrollY(): number {
+    return this._overscrollY;
+  }
+
+  // =========================================================================
+  // 콘텐츠 경계 및 Overscroll
+  // =========================================================================
+
+  /**
+   * 콘텐츠 크기 설정 (경계 체크용)
+   */
+  setContentBounds(height: number, minX?: number, maxX?: number): void {
+    this._contentHeight = height;
+    if (minX !== undefined) this._contentMinX = minX;
+    if (maxX !== undefined) this._contentMaxX = maxX;
+  }
+
+  /**
+   * 스크롤 경계 체크 및 Overscroll Bounce 적용
+   */
+  applyScrollBounds(): void {
+    const maxScrollY = Math.max(0, this._contentHeight - this._height);
+
+    // Y축 경계 체크
+    if (this._scrollY < 0) {
+      this._overscrollY = this._scrollY;
+      this._scrollY = 0;
+    } else if (this._scrollY > maxScrollY) {
+      this._overscrollY = this._scrollY - maxScrollY;
+      this._scrollY = maxScrollY;
+    } else {
+      this._overscrollY = 0;
+    }
+
+    // X축 경계 도달 감지
+    this.checkXBoundary();
+  }
+
+  /**
+   * X축 경계 도달 체크 및 이벤트 발생
+   */
+  private checkXBoundary(): void {
+    const now = Date.now();
+    const cooldownMs = 500; // 500ms 쿨다운
+
+    const visibleRange = this.getVisibleRange();
+    const margin = this._width * 0.1; // 뷰포트 너비의 10%
+
+    // 왼쪽 경계 체크
+    if (this._contentMinX > 0) {
+      const leftEdgeX = this.scale.dateToX(visibleRange.start);
+      if (leftEdgeX < this._contentMinX + margin) {
+        const lastLeft = this.boundaryReachedCooldown.get('left') || 0;
+        if (now - lastLeft > cooldownMs) {
+          this.boundaryReachedCooldown.set('left', now);
+          this.emit('boundary-reached', 'left');
+        }
+      }
+    }
+
+    // 오른쪽 경계 체크
+    if (this._contentMaxX > 0) {
+      const rightEdgeX = this.scale.dateToX(visibleRange.end);
+      if (rightEdgeX > this._contentMaxX - margin) {
+        const lastRight = this.boundaryReachedCooldown.get('right') || 0;
+        if (now - lastRight > cooldownMs) {
+          this.boundaryReachedCooldown.set('right', now);
+          this.emit('boundary-reached', 'right');
+        }
+      }
+    }
+  }
+
+  /**
+   * Overscroll Bounce 애니메이션 시작
+   */
+  startOverscrollBounce(): void {
+    if (this._overscrollY === 0) return;
+
+    // 기존 애니메이션 취소
+    if (this.overscrollBounceAnimation !== null) {
+      cancelAnimationFrame(this.overscrollBounceAnimation);
+    }
+
+    const animate = () => {
+      // 탄성 감쇠 (ease-out)
+      this._overscrollY *= 0.85;
+
+      if (Math.abs(this._overscrollY) < 0.5) {
+        this._overscrollY = 0;
+        this.overscrollBounceAnimation = null;
+        this.emit('overscroll-bounce');
+        return;
+      }
+
+      this.emit('scroll');
+      this.overscrollBounceAnimation = requestAnimationFrame(animate);
+    };
+
+    this.overscrollBounceAnimation = requestAnimationFrame(animate);
+  }
+
+  /**
+   * Overscroll 상태 초기화
+   */
+  resetOverscroll(): void {
+    if (this.overscrollBounceAnimation !== null) {
+      cancelAnimationFrame(this.overscrollBounceAnimation);
+      this.overscrollBounceAnimation = null;
+    }
+    this._overscrollY = 0;
+  }
+
   // =========================================================================
   // 스케일 변경
   // =========================================================================
@@ -412,11 +542,12 @@ export class ViewportManager {
   /**
    * 이벤트 발생
    */
-  private emit(type: ViewportChangeEvent['type']): void {
+  private emit(type: ViewportChangeEvent['type'], boundaryDirection?: 'left' | 'right' | 'top' | 'bottom'): void {
     const event: ViewportChangeEvent = {
       type,
       viewport: this.state,
       scale: this.scale.unit,
+      boundaryDirection,
     };
 
     this.listeners.forEach(callback => callback(event));

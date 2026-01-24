@@ -13,6 +13,7 @@ export const MS = {
   HOUR: 60 * 60 * 1000,
   DAY: 24 * 60 * 60 * 1000,
   WEEK: 7 * 24 * 60 * 60 * 1000,
+  MONTH: 30 * 24 * 60 * 60 * 1000, // 평균 30일
 } as const;
 
 /**
@@ -21,9 +22,13 @@ export const MS = {
 export function unitToMs(unit: TimeScaleUnit): number {
   switch (unit) {
     case '10min': return 10 * MS.MINUTE;
+    case '30min': return 30 * MS.MINUTE;
     case 'hour': return MS.HOUR;
+    case '6hour': return 6 * MS.HOUR;
+    case '12hour': return 12 * MS.HOUR;
     case 'day': return MS.DAY;
     case 'week': return MS.WEEK;
+    case 'month': return MS.MONTH;
   }
 }
 
@@ -37,8 +42,19 @@ export function floorToUnit(date: Date, unit: TimeScaleUnit): Date {
     case '10min':
       d.setMinutes(Math.floor(d.getMinutes() / 10) * 10, 0, 0);
       break;
+    case '30min':
+      d.setMinutes(Math.floor(d.getMinutes() / 30) * 30, 0, 0);
+      break;
     case 'hour':
       d.setMinutes(0, 0, 0);
+      break;
+    case '6hour':
+      d.setMinutes(0, 0, 0);
+      d.setHours(Math.floor(d.getHours() / 6) * 6);
+      break;
+    case '12hour':
+      d.setMinutes(0, 0, 0);
+      d.setHours(Math.floor(d.getHours() / 12) * 12);
       break;
     case 'day':
       d.setHours(0, 0, 0, 0);
@@ -49,6 +65,10 @@ export function floorToUnit(date: Date, unit: TimeScaleUnit): Date {
       const day = d.getDay();
       const diff = day === 0 ? 6 : day - 1;
       d.setDate(d.getDate() - diff);
+      break;
+    case 'month':
+      d.setHours(0, 0, 0, 0);
+      d.setDate(1);
       break;
   }
 
@@ -76,14 +96,26 @@ export function addUnit(date: Date, unit: TimeScaleUnit, count: number): Date {
     case '10min':
       d.setMinutes(d.getMinutes() + count * 10);
       break;
+    case '30min':
+      d.setMinutes(d.getMinutes() + count * 30);
+      break;
     case 'hour':
       d.setHours(d.getHours() + count);
+      break;
+    case '6hour':
+      d.setHours(d.getHours() + count * 6);
+      break;
+    case '12hour':
+      d.setHours(d.getHours() + count * 12);
       break;
     case 'day':
       d.setDate(d.getDate() + count);
       break;
     case 'week':
       d.setDate(d.getDate() + count * 7);
+      break;
+    case 'month':
+      d.setMonth(d.getMonth() + count);
       break;
   }
 
@@ -106,12 +138,18 @@ export function formatDate(date: Date, unit: TimeScaleUnit): string {
 
   switch (unit) {
     case '10min':
+    case '30min':
     case 'hour':
       return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    case '6hour':
+    case '12hour':
+      return `${date.getMonth() + 1}/${date.getDate()} ${pad(date.getHours())}:00`;
     case 'day':
       return `${date.getMonth() + 1}/${date.getDate()}`;
     case 'week':
       return `${date.getMonth() + 1}/${date.getDate()}`;
+    case 'month':
+      return `${date.getFullYear()}/${date.getMonth() + 1}`;
   }
 }
 

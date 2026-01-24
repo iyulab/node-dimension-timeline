@@ -87,6 +87,10 @@ export class DimensionSelector extends LitElement {
   @property({ type: Number, attribute: 'zoom-y' })
   zoomY: number = 1.0;
 
+  /** 선택된 Dimension 값 (row 강조용) */
+  @property({ type: String, attribute: 'selected-dimension-value' })
+  selectedDimensionValue: string | null = null;
+
   // =========================================================================
   // State
   // =========================================================================
@@ -175,13 +179,14 @@ export class DimensionSelector extends LitElement {
 
           // 기본 높이에 zoomY 적용
           const baseHeight = 32 * this.zoomY;
+          const isSelected = this.selectedDimensionValue === value.key;
           const itemStyle = hasContextPositions && position
             ? `position: absolute; top: ${itemY}px; left: 0; right: 0; height: ${position.height}px; background-color: ${rowBg};`
             : `min-height: ${baseHeight}px; background-color: ${rowBg};`;
 
           return html`
             <div
-              class="dimension-value-item ${hasContextPositions ? 'synced' : ''}"
+              class="dimension-value-item ${hasContextPositions ? 'synced' : ''} ${isSelected ? 'selected' : ''}"
               style=${itemStyle}
               @click=${() => this.handleValueClick(value)}
             >
@@ -190,6 +195,7 @@ export class DimensionSelector extends LitElement {
               ` : nothing}
               <span class="value-label">${value.label}</span>
               <span class="value-count">${value.count}</span>
+              ${isSelected ? html`<div class="selection-indicator"></div>` : nothing}
             </div>
           `;
         }) : html`

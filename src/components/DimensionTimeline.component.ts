@@ -90,6 +90,10 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   @property({ type: Boolean, attribute: 'cross-dimension-move' })
   crossDimensionMove: boolean = true;
 
+  /** 이동/리사이즈 비활성화 줌 레벨 임계치 (이 값 이하면 선택만 가능) */
+  @property({ type: Number, attribute: 'disable-edit-zoom-threshold' })
+  disableEditZoomThreshold: number = 0.6;
+
   /** 템플릿 */
   @property({ type: String })
   template: string = 'default';
@@ -162,7 +166,13 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     });
 
     // 증분 업데이트 구독
-    this.incrementalUpdater.onUpdate(region => {
+    this.incrementalUpdater.onUpdate(async region => {
+      // DataSource에서 최신 데이터 가져오기
+      if (this.dataSource) {
+        const result = await this.dataSource.query();
+        this.tasks = result.tasks;
+      }
+
       if (region.fullRecalculate) {
         this.recalculateLayout();
       } else {
@@ -176,6 +186,9 @@ export class DimensionTimeline<T = unknown> extends LitElement {
 
     // 휠 이벤트
     this.addEventListener('wheel', this.handleWheel, { passive: false });
+
+    // Window mouseup (드래그 중 canvas 영역 밖에서 마우스를 놓는 경우 처리)
+    window.addEventListener('mouseup', this.handleWindowMouseUp);
 
     // 실시간 타이머 시작
     this.startRealtimeTimer();
@@ -191,6 +204,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
 
     this.removeEventListener('keydown', this.handleKeyDown);
     this.removeEventListener('wheel', this.handleWheel);
+    window.removeEventListener('mouseup', this.handleWindowMouseUp);
   }
 
   /**
@@ -303,9 +317,13 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   render() {
     const scaleLabels: Record<TimeScaleUnit, string> = {
       '10min': '10분',
+      '30min': '30분',
       'hour': '시간',
+      '6hour': '6시간',
+      '12hour': '12시간',
       'day': '일',
       'week': '주',
+      'month': '월',
     };
 
     const activeDim = this.dimensions.find(d => d.key === this.activeDimension);
@@ -365,6 +383,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
             .scrollY=${this.viewportManager.scrollY}
             .zoomY=${this.viewportManager.zoomY}
             .contextColors=${this.getContextColorsMap()}
+            .selectedDimensionValue=${this.selectedDimensionValue}
             ?sync-mode=${this.contextPositions.size > 0}
             @dimension-change=${this.handleDimensionChange}
             @dimension-value-click=${this.handleDimensionValueClick}
@@ -548,6 +567,9 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       currentY += height;
     }
 
+    // 콘텐츠 높이를 ViewportManager에 설정 (경계 체크용)
+    this.viewportManager.setContentBounds(currentY);
+
     // 그리드 라인 업데이트
     this.updateGridLines();
 
@@ -594,10 +616,20 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   // Event Handlers
   // =========================================================================
 
-  private handleViewportChange(_event: any): void {
+  private handleViewportChange(event: any): void {
     this.updateGridLines();
     this.updateRenderedTimeRegions();
     this.nowX = this.viewportManager.dateToX(new Date());
+
+    // boundary-reached 이벤트 전파
+    if (event.type === 'boundary-reached' && event.boundaryDirection) {
+      this.emit('timeline-boundary-reached', {
+        direction: event.boundaryDirection,
+        currentStart: this.viewportManager.getVisibleRange().start,
+        currentEnd: this.viewportManager.getVisibleRange().end,
+      });
+    }
+
     this.requestUpdate();
   }
 
@@ -654,6 +686,12 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     // 선택
     this.selectTask(task.id);
 
+    // 줌 레벨이 임계치 이하면 선택만 가능 (이동/리사이즈 비활성화)
+    const currentZoomY = this.viewportManager.zoomY;
+    if (currentZoomY <= this.disableEditZoomThreshold) {
+      return; // 선택만 하고 드래그 시작 안 함
+    }
+
     // 드래그 시작
     if ((area === 'body' && this.tasksDraggable) ||
         ((area === 'resize-start' || area === 'resize-end') && this.tasksResizable)) {
@@ -701,6 +739,17 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     this.viewportManager.endPan();
   }
 
+  private handleWindowMouseUp = (_e: MouseEvent): void => {
+    // 드래그 중 canvas 영역 밖에서 마우스를 놓는 경우 처리
+    if (this.dragState) {
+      this.endDrag(false);
+    }
+    this.viewportManager.endPan();
+
+    // Overscroll Bounce 시작
+    this.viewportManager.startOverscrollBounce();
+  };
+
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape' && this.dragState) {
       this.endDrag(true);
@@ -729,6 +778,9 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       // 일반 휠: 상하 스크롤
       this.viewportManager.scrollBy(0, e.deltaY);
     }
+
+    // 스크롤 경계 체크
+    this.viewportManager.applyScrollBounds();
     this.requestUpdate();
   };
 
@@ -800,9 +852,10 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       }
     }
 
-    // 스냅
-    this.dragState.snappedStart = snapToUnit(newStart, this.scale);
-    this.dragState.snappedEnd = snapToUnit(newEnd, this.scale);
+    // 스냅 (줌 레벨에 맞는 단위로)
+    const snapUnit = this.viewportManager.timeScale.getSnapUnit();
+    this.dragState.snappedStart = snapToUnit(newStart, snapUnit);
+    this.dragState.snappedEnd = snapToUnit(newEnd, snapUnit);
 
     // Canvas 업데이트
     if (this.canvasEl) {
@@ -845,7 +898,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
 
     if (!cancelled) {
       if (mode === 'move') {
-        const event = this.emit('timeline-task-move', {
+        const notCancelled = this.emit('timeline-task-move', {
           task,
           originalStart,
           originalEnd,
@@ -855,7 +908,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
           newDimensionValue: currentDimensionValue,
         }, { cancelable: true });
 
-        if (!event) {
+        if (notCancelled) {
           // 이벤트가 취소되지 않았으면 DataSource 업데이트
           this.dataSource?.update(task.id, {
             start: snappedStart,
@@ -863,7 +916,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
           });
         }
       } else {
-        const event = this.emit('timeline-task-resize', {
+        const notCancelled = this.emit('timeline-task-resize', {
           task,
           originalStart,
           originalEnd,
@@ -872,7 +925,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
           edge: mode === 'resize-start' ? 'start' : 'end',
         }, { cancelable: true });
 
-        if (!event) {
+        if (notCancelled) {
           this.dataSource?.update(task.id, {
             start: snappedStart,
             end: snappedEnd,
@@ -955,9 +1008,13 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   private getMsPerUnit(unit: TimeScaleUnit): number {
     switch (unit) {
       case '10min': return 10 * 60 * 1000;
+      case '30min': return 30 * 60 * 1000;
       case 'hour': return 60 * 60 * 1000;
+      case '6hour': return 6 * 60 * 60 * 1000;
+      case '12hour': return 12 * 60 * 60 * 1000;
       case 'day': return 24 * 60 * 60 * 1000;
       case 'week': return 7 * 24 * 60 * 60 * 1000;
+      case 'month': return 30 * 24 * 60 * 60 * 1000;
     }
   }
 

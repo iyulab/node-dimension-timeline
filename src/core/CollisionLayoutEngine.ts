@@ -221,18 +221,24 @@ export class CollisionLayoutEngine {
     // 시작 시간 기준 정렬
     const sorted = [...tasks].sort((a, b) => a.start.getTime() - b.start.getTime());
 
-    // 각 행의 종료 시간 추적 (IntervalTree 사용)
+    // 각 행의 종료 시간 추적
     const rowEndTimes: number[] = [];
 
     for (const task of sorted) {
-      const startX = timeScale.dateToX(task.start) - this.options.horizontalPadding;
-      const endX = timeScale.dateToX(task.end) + this.options.horizontalPadding;
+      const startX = timeScale.dateToX(task.start);
+      const naturalEndX = timeScale.dateToX(task.end);
+      const naturalWidth = naturalEndX - startX;
+
+      // minTaskWidth를 고려한 실제 종료 X 계산
+      const actualWidth = Math.max(this.options.minTaskWidth, naturalWidth);
+      const endX = startX + actualWidth + this.options.horizontalPadding;
+      const effectiveStartX = startX - this.options.horizontalPadding;
 
       // 사용 가능한 행 찾기 (가장 빨리 끝나는 행)
       let assignedRow = -1;
 
       for (let row = 0; row < rowEndTimes.length; row++) {
-        if (rowEndTimes[row] <= startX) {
+        if (rowEndTimes[row] <= effectiveStartX) {
           assignedRow = row;
           break;
         }

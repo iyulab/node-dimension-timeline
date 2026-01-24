@@ -274,7 +274,7 @@ export class TimelineCanvas<T = unknown> extends LitElement {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const hitResult = this.hitTestManager.hitTest(x, y, this.scrollY);
+    const hitResult = this.hitTestManager.hitTest(x, y, this.scrollX, this.scrollY);
 
     if (hitResult.task) {
       this.emit('timeline-task-mousedown', {
@@ -300,7 +300,7 @@ export class TimelineCanvas<T = unknown> extends LitElement {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const hitResult = this.hitTestManager.hitTest(x, y, this.scrollY);
+    const hitResult = this.hitTestManager.hitTest(x, y, this.scrollX, this.scrollY);
 
     // 호버 상태 업데이트
     const newHoveredId = hitResult.task?.id ?? null;
@@ -343,7 +343,7 @@ export class TimelineCanvas<T = unknown> extends LitElement {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const hitResult = this.hitTestManager.hitTest(x, y, this.scrollY);
+    const hitResult = this.hitTestManager.hitTest(x, y, this.scrollX, this.scrollY);
 
     if (hitResult.task) {
       this.emit('timeline-task-dblclick', {
@@ -385,7 +385,7 @@ export class TimelineCanvas<T = unknown> extends LitElement {
    * 히트 테스트 수행
    */
   hitTest(x: number, y: number): HitTestResult<T> {
-    return this.hitTestManager.hitTest(x, y, this.scrollY);
+    return this.hitTestManager.hitTest(x, y, this.scrollX, this.scrollY);
   }
 
   /**

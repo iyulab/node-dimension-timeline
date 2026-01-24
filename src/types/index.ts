@@ -124,8 +124,9 @@ export interface TimeRegion {
 
 /**
  * 시간 스케일 단위
+ * 확장된 시간 단위: 30분, 1시간, 6시간, 12시간, 일, 주, 월
  */
-export type TimeScaleUnit = '10min' | 'hour' | 'day' | 'week';
+export type TimeScaleUnit = '10min' | '30min' | 'hour' | '6hour' | '12hour' | 'day' | 'week' | 'month';
 
 /**
  * 시간 스케일 설정

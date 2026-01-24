@@ -213,4 +213,25 @@ export const styles = css`
     color: var(--dimension-selector-empty-text, #94a3b8);
     font-size: 13px;
   }
+
+  /* 선택된 row */
+  .dimension-value-item.selected {
+    background: var(--dimension-value-selected-bg, rgba(239, 68, 68, 0.08));
+    position: relative;
+  }
+
+  .dimension-value-item.selected .value-label {
+    font-weight: 600;
+    color: var(--dimension-value-selected-text, #dc2626);
+  }
+
+  /* 선택 인디케이터 - 우측 세로선 */
+  .selection-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--selection-indicator-color, #ef4444);
+  }
 `;

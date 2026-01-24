@@ -11,15 +11,20 @@ import { unitToMs, floorToUnit, addUnit } from '../utilities/DateUtils.js';
  */
 const SCALE_DEFAULTS: Record<TimeScaleUnit, Omit<TimeScaleConfig, 'unit'>> = {
   '10min': { pixelsPerUnit: 60, minPixelsPerUnit: 20, maxPixelsPerUnit: 200 },
+  '30min': { pixelsPerUnit: 50, minPixelsPerUnit: 20, maxPixelsPerUnit: 180 },
   'hour': { pixelsPerUnit: 80, minPixelsPerUnit: 30, maxPixelsPerUnit: 300 },
+  '6hour': { pixelsPerUnit: 60, minPixelsPerUnit: 25, maxPixelsPerUnit: 200 },
+  '12hour': { pixelsPerUnit: 80, minPixelsPerUnit: 30, maxPixelsPerUnit: 250 },
   'day': { pixelsPerUnit: 120, minPixelsPerUnit: 40, maxPixelsPerUnit: 400 },
   'week': { pixelsPerUnit: 200, minPixelsPerUnit: 80, maxPixelsPerUnit: 600 },
+  'month': { pixelsPerUnit: 300, minPixelsPerUnit: 100, maxPixelsPerUnit: 800 },
 };
 
 /**
  * 스케일 순서 (줌 인/아웃 시 전환용)
+ * 10분 → 30분 → 1시간 → 6시간 → 12시간 → 일 → 주 → 월
  */
-const SCALE_ORDER: TimeScaleUnit[] = ['10min', 'hour', 'day', 'week'];
+const SCALE_ORDER: TimeScaleUnit[] = ['10min', '30min', 'hour', '6hour', '12hour', 'day', 'week', 'month'];
 
 /**
  * TimeScale 클래스
@@ -317,5 +322,45 @@ export class TimeScale {
   clone(): TimeScale {
     const clone = new TimeScale(this._config.unit, this._origin, this._config.pixelsPerUnit);
     return clone;
+  }
+
+  /**
+   * 현재 줌 레벨에 맞는 스냅 단위 가져오기
+   * 줌이 축소될수록 더 큰 단위로 스냅
+   */
+  getSnapUnit(): TimeScaleUnit {
+    const zoom = this.getZoom();
+    const unit = this._config.unit;
+
+    // 줌 레벨에 따라 스냅 단위 결정
+    // 줌이 작을수록 더 큰 단위로 스냅
+    if (zoom >= 1.5) {
+      // 줌 인 상태: 현재 단위 또는 더 세밀한 단위
+      return unit;
+    } else if (zoom >= 1.0) {
+      // 기본 상태: 현재 단위
+      return unit;
+    } else if (zoom >= 0.7) {
+      // 약간 축소: 한 단계 위 단위
+      const idx = SCALE_ORDER.indexOf(unit);
+      return idx < SCALE_ORDER.length - 1 ? SCALE_ORDER[idx + 1] : unit;
+    } else {
+      // 많이 축소: 두 단계 위 단위
+      const idx = SCALE_ORDER.indexOf(unit);
+      return idx < SCALE_ORDER.length - 2 ? SCALE_ORDER[idx + 2] : SCALE_ORDER[SCALE_ORDER.length - 1];
+    }
+  }
+
+  /**
+   * 스냅 간격을 밀리초로 가져오기
+   * 최소 10분 간격 보장
+   */
+  getSnapIntervalMs(): number {
+    const snapUnit = this.getSnapUnit();
+    const ms = unitToMs(snapUnit);
+
+    // 최소 10분 간격 보장
+    const minInterval = 10 * 60 * 1000; // 10분
+    return Math.max(ms, minInterval);
   }
 }

@@ -433,9 +433,13 @@ export class InteractionManager<T = unknown> {
   private getMsPerUnit(unit: TimeScaleUnit): number {
     switch (unit) {
       case '10min': return 10 * 60 * 1000;
+      case '30min': return 30 * 60 * 1000;
       case 'hour': return 60 * 60 * 1000;
+      case '6hour': return 6 * 60 * 60 * 1000;
+      case '12hour': return 12 * 60 * 60 * 1000;
       case 'day': return 24 * 60 * 60 * 1000;
       case 'week': return 7 * 24 * 60 * 60 * 1000;
+      case 'month': return 30 * 24 * 60 * 60 * 1000;
     }
   }
 }

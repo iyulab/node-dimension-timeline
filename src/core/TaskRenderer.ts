@@ -84,8 +84,9 @@ export class TaskRenderer {
   private backgroundColor = '#FFFFFF';
   private alternatingRowColor = 'rgba(0, 0, 0, 0.02)';
   private timeRegionDefaultColor = 'rgba(100, 100, 100, 0.1)';
-  private selectedRowColor = 'rgba(59, 130, 246, 0.08)'; // 연한 파란색
+  private selectedRowColor = 'rgba(239, 68, 68, 0.06)'; // 연한 빨간색
   private contextDividerColor = 'rgba(0, 0, 0, 0.1)'; // Context 구분선 색상
+  private selectionLineColor = '#ef4444'; // 선택 라인 색상 (빨간색)
 
   constructor(canvas: HTMLCanvasElement, templateName: string = 'default') {
     this.canvas = canvas;
@@ -148,6 +149,11 @@ export class TaskRenderer {
     // 그리드 라인
     if (options.showGridLines !== false) {
       this.renderGridLines(gridLines);
+    }
+
+    // 선택된 row 중앙 가로선 (Task 뒤에 표시)
+    if (options.selectedDimensionValue) {
+      this.renderSelectionCenterLine(contextPositions, scrollY, options.selectedDimensionValue);
     }
 
     // Context별 Task 렌더링
@@ -428,6 +434,37 @@ export class TaskRenderer {
     this.ctx.fill();
   }
 
+  /**
+   * 선택된 row의 중앙 가로선 렌더링
+   */
+  private renderSelectionCenterLine(
+    contextPositions: Map<string, { y: number; height: number }>,
+    scrollY: number,
+    selectedDimensionValue: string,
+  ): void {
+    const position = contextPositions.get(selectedDimensionValue);
+    if (!position) return;
+
+    const contextY = position.y - scrollY;
+    const centerY = contextY + position.height / 2;
+
+    // 뷰포트 밖이면 스킵
+    if (centerY < 0 || centerY > this.height) return;
+
+    // 가로 중앙선 그리기
+    this.ctx.save();
+    this.ctx.strokeStyle = this.selectionLineColor;
+    this.ctx.lineWidth = 1;
+    this.ctx.setLineDash([4, 4]); // 점선
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(0, Math.floor(centerY) + 0.5);
+    this.ctx.lineTo(this.width, Math.floor(centerY) + 0.5);
+    this.ctx.stroke();
+
+    this.ctx.restore();
+  }
+
   private renderDraggingTask(
     contexts: ContextLayoutResult[],
     options: RenderOptions,
@@ -531,5 +568,9 @@ export class TaskRenderer {
 
   setContextDividerColor(color: string): void {
     this.contextDividerColor = color;
+  }
+
+  setSelectionLineColor(color: string): void {
+    this.selectionLineColor = color;
   }
 }

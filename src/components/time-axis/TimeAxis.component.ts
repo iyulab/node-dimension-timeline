@@ -205,18 +205,29 @@ export class TimeAxis extends LitElement {
     switch (scale) {
       case '10min':
         return { primaryUnit: 'hour', secondaryUnit: '10min' };
+      case '30min':
+        return { primaryUnit: 'hour', secondaryUnit: '30min' };
       case 'hour':
         return { primaryUnit: 'day', secondaryUnit: 'hour' };
+      case '6hour':
+        return { primaryUnit: 'day', secondaryUnit: '6hour' };
+      case '12hour':
+        return { primaryUnit: 'day', secondaryUnit: '12hour' };
       case 'day':
         return { primaryUnit: 'week', secondaryUnit: 'day' };
       case 'week':
-        return { primaryUnit: 'week', secondaryUnit: 'day' };
+        return { primaryUnit: 'month', secondaryUnit: 'week' };
+      case 'month':
+        return { primaryUnit: 'month', secondaryUnit: 'week' };
       default:
         return { primaryUnit: 'week', secondaryUnit: 'day' };
     }
   }
 
   private formatLabel(date: Date, unit: TimeScaleUnit, primary: boolean): string {
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
     if (primary) {
       switch (unit) {
         case 'hour':
@@ -225,18 +236,27 @@ export class TimeAxis extends LitElement {
           return `${date.getMonth() + 1}월 ${date.getDate()}일`;
         case 'week':
           return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+        case 'month':
+          return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
         default:
           return formatDate(date, unit);
       }
     } else {
       switch (unit) {
         case '10min':
-          return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+          return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        case '30min':
+          return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
         case 'hour':
           return `${date.getHours()}:00`;
+        case '6hour':
+          return `${pad(date.getHours())}:00`;
+        case '12hour':
+          return `${date.getHours() < 12 ? '오전' : '오후'} ${date.getHours() % 12 || 12}시`;
         case 'day':
-          const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
           return `${date.getDate()} (${dayNames[date.getDay()]})`;
+        case 'week':
+          return `${date.getMonth() + 1}/${date.getDate()}주`;
         default:
           return formatDate(date, unit);
       }
@@ -256,9 +276,13 @@ export class TimeAxis extends LitElement {
   private getMsPerUnit(unit: TimeScaleUnit): number {
     switch (unit) {
       case '10min': return 10 * 60 * 1000;
+      case '30min': return 30 * 60 * 1000;
       case 'hour': return 60 * 60 * 1000;
+      case '6hour': return 6 * 60 * 60 * 1000;
+      case '12hour': return 12 * 60 * 60 * 1000;
       case 'day': return 24 * 60 * 60 * 1000;
       case 'week': return 7 * 24 * 60 * 60 * 1000;
+      case 'month': return 30 * 24 * 60 * 60 * 1000;
     }
   }
 }
