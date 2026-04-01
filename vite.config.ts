@@ -26,7 +26,6 @@ export default defineConfig({
     rollupOptions: {
       // 외부 종속성 라이브러리
       external: [
-        /^@iyulab\/components.*/,
         /^lit.*/,
       ],
       output: {
