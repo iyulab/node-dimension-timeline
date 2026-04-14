@@ -64,6 +64,7 @@ export class ViewportManager {
 
   // 팬 상태
   private isPanning: boolean = false;
+  private _hasPanned: boolean = false;
   private panStartX: number = 0;
   private panStartY: number = 0;
   private panStartScrollX: number = 0;
@@ -341,6 +342,7 @@ export class ViewportManager {
     if (!this.config.pannable) return;
 
     this.isPanning = true;
+    this._hasPanned = false;
     this.panStartX = x;
     this.panStartY = y;
     this.panStartScrollX = this._scrollX;
@@ -355,6 +357,10 @@ export class ViewportManager {
 
     const deltaX = this.panStartX - x;
     const deltaY = this.panStartY - y;
+
+    if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+      this._hasPanned = true;
+    }
 
     this._scrollX = this.panStartScrollX + deltaX;
     this._scrollY = this.panStartScrollY + deltaY;
@@ -374,6 +380,10 @@ export class ViewportManager {
    */
   get panning(): boolean {
     return this.isPanning;
+  }
+
+  get hasPanned(): boolean {
+    return this._hasPanned;
   }
 
   /**

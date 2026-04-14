@@ -94,6 +94,10 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   @property({ type: Number, attribute: 'disable-edit-zoom-threshold' })
   disableEditZoomThreshold: number = 0.6;
 
+  /** 이동/리사이즈 허용 최대 스케일 단위 (이 스케일 이상 zoom-out 시 선택만 가능) */
+  @property({ type: String, attribute: 'max-edit-scale' })
+  maxEditScale: string = 'hour';
+
   /** 템플릿 */
   @property({ type: String })
   template: string = 'default';
@@ -152,6 +156,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   private dragState: DragState<T> | null = null;
   private collapsedContexts: Set<string> = new Set();
   private resizeObserver: ResizeObserver | null = null;
+  private _taskClickedInThisGesture: boolean = false;
 
   // =========================================================================
   // Lifecycle
@@ -509,9 +514,8 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       });
     }
 
-    // contextPositions와 동일한 순서 유지 (key 기준 정렬)
-    // CollisionLayoutEngine.groupByDimension()과 동일한 정렬
-    return result.sort((a, b) => a.key.localeCompare(b.key));
+    // 정의된 값 순서를 유지 (dimensions.values 순서 + 나머지)
+    return result;
   }
 
   // =========================================================================
@@ -683,12 +687,28 @@ export class DimensionTimeline<T = unknown> extends LitElement {
 
     if (originalEvent.button !== 0) return; // 좌클릭만
 
+    // task 클릭 플래그 (mouseup에서 빈 영역 선택 해제 방지)
+    this._taskClickedInThisGesture = true;
+
     // 선택
     this.selectTask(task.id);
 
     // 줌 레벨이 임계치 이하면 선택만 가능 (이동/리사이즈 비활성화)
     const currentZoomY = this.viewportManager.zoomY;
     if (currentZoomY <= this.disableEditZoomThreshold) {
+      return; // 선택만 하고 드래그 시작 안 함
+    }
+
+    // 스케일이 maxEditScale보다 zoom-out 되었으면 선택만 가능
+    const scaleOrder = ['10min', '30min', 'hour', '6hour', '12hour', 'day', 'week', 'month'];
+    const currentIdx = scaleOrder.indexOf(this.viewportManager.scaleUnit);
+    const maxIdx = scaleOrder.indexOf(this.maxEditScale);
+    if (currentIdx > maxIdx) {
+      return; // 선택만 하고 드래그 시작 안 함
+    }
+
+    // 실적이 있는 태스크는 편집 불가 (pending만 조작 가능)
+    if (task.status && task.status !== 'pending') {
       return; // 선택만 하고 드래그 시작 안 함
     }
 
@@ -982,6 +1002,16 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     if (task) {
       this.scrollToDate(task.start, 'center');
       this.selectTask(taskId);
+    }
+  }
+
+  /** Dimension 값 위치로 스크롤 */
+  scrollToDimensionValue(dimensionValue: string): void {
+    const position = this.contextPositions.get(dimensionValue);
+    if (position) {
+      this.viewportManager.setScroll(this.viewportManager.scrollX, position.y);
+      this.selectedDimensionValue = dimensionValue;
+      this.requestUpdate();
     }
   }
 

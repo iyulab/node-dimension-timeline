@@ -128,8 +128,8 @@ export const DEFAULT_STYLE_CONFIG: TaskStyleConfig = {
   progressBarHeight: 3,
   progressBarColor: 'rgba(255, 255, 255, 0.8)',
   progressBarBgColor: 'rgba(0, 0, 0, 0.2)',
-  resizeHandleWidth: 8,
-  resizeHandleColor: 'rgba(255, 255, 255, 0.3)',
+  resizeHandleWidth: 6,
+  resizeHandleColor: 'rgba(255, 255, 255, 0.4)',
 };
 
 /**

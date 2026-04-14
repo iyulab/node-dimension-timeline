@@ -243,8 +243,9 @@ export class InteractionManager<T = unknown> {
 
     // 스냅
     if (this.config.snapEnabled) {
-      this.dragState.snappedStart = snapToUnit(newStart, scale);
-      this.dragState.snappedEnd = snapToUnit(newEnd, scale);
+      const snapUnit = timeScale.getSnapUnit();
+      this.dragState.snappedStart = snapToUnit(newStart, snapUnit);
+      this.dragState.snappedEnd = snapToUnit(newEnd, snapUnit);
     } else {
       this.dragState.snappedStart = newStart;
       this.dragState.snappedEnd = newEnd;

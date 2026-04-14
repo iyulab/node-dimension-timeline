@@ -18,7 +18,7 @@ export interface HitTestOptions {
 }
 
 const DEFAULT_HIT_TEST_OPTIONS: HitTestOptions = {
-  resizeHandleWidth: 8,
+  resizeHandleWidth: 14,
   hitPadding: 2,
 };
 

@@ -99,14 +99,18 @@ export class TimeAxis extends LitElement {
       <div class="time-axis-container" style="height: ${this.height}px">
         <!-- 상단 (Primary) 라벨 -->
         <div class="primary-labels">
-          ${this.primaryLabels.map(label => html`
-            <div
-              class="time-label primary"
-              style="left: ${label.x}px; width: ${label.width}px"
-            >
-              ${label.text}
-            </div>
-          `)}
+          ${this.primaryLabels.map(label => {
+            const clampedLeft = Math.max(0, label.x);
+            const clampedWidth = label.width - (clampedLeft - label.x);
+            return html`
+              <div
+                class="time-label primary"
+                style="left: ${clampedLeft}px; width: ${clampedWidth}px"
+              >
+                ${label.text}
+              </div>
+            `;
+          })}
         </div>
 
         <!-- 하단 (Secondary) 라벨 -->
@@ -270,7 +274,8 @@ export class TimeAxis extends LitElement {
     const originMs = this.visibleRange.start.getTime();
     const dateMs = date.getTime();
 
-    return ((dateMs - originMs) / msPerUnit) * this.pixelsPerUnit - this.scrollX;
+    // visibleRange.start가 이미 scroll 위치를 반영하므로 scrollX 차감 불필요
+    return ((dateMs - originMs) / msPerUnit) * this.pixelsPerUnit;
   }
 
   private getMsPerUnit(unit: TimeScaleUnit): number {

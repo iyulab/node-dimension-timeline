@@ -19,8 +19,10 @@ export const styles = css`
   /* 상단 라벨 (월/주) */
   .primary-labels {
     display: flex;
+    position: relative;
     height: 50%;
     border-bottom: 1px solid var(--time-axis-divider, #e2e8f0);
+    overflow: hidden;
   }
 
   /* 하단 라벨 (일/시간) */

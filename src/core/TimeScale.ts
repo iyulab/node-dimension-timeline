@@ -331,23 +331,15 @@ export class TimeScale {
   getSnapUnit(): TimeScaleUnit {
     const zoom = this.getZoom();
     const unit = this._config.unit;
+    const idx = SCALE_ORDER.indexOf(unit);
 
-    // 줌 레벨에 따라 스냅 단위 결정
-    // 줌이 작을수록 더 큰 단위로 스냅
-    if (zoom >= 1.5) {
-      // 줌 인 상태: 현재 단위 또는 더 세밀한 단위
-      return unit;
-    } else if (zoom >= 1.0) {
-      // 기본 상태: 현재 단위
-      return unit;
+    if (zoom >= 1.0) {
+      // 줌 인/기본: 한 단계 세밀한 단위 (최소 10min)
+      return idx > 0 ? SCALE_ORDER[idx - 1] : unit;
     } else if (zoom >= 0.7) {
-      // 약간 축소: 한 단계 위 단위
-      const idx = SCALE_ORDER.indexOf(unit);
-      return idx < SCALE_ORDER.length - 1 ? SCALE_ORDER[idx + 1] : unit;
+      return unit;
     } else {
-      // 많이 축소: 두 단계 위 단위
-      const idx = SCALE_ORDER.indexOf(unit);
-      return idx < SCALE_ORDER.length - 2 ? SCALE_ORDER[idx + 2] : SCALE_ORDER[SCALE_ORDER.length - 1];
+      return idx < SCALE_ORDER.length - 1 ? SCALE_ORDER[idx + 1] : unit;
     }
   }
 

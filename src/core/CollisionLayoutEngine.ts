@@ -202,8 +202,14 @@ export class CollisionLayoutEngine {
       }
     }
 
-    // 값 기준 정렬
-    return new Map([...grouped.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+    // 값 기준 정렬 (_unassigned_/(none)은 맨 뒤)
+    return new Map([...grouped.entries()].sort((a, b) => {
+      const isSpecial = (k: string) => !k || k.startsWith('_unassigned') || k === '(none)';
+      const aS = isSpecial(a[0]) ? 1 : 0;
+      const bS = isSpecial(b[0]) ? 1 : 0;
+      if (aS !== bS) return aS - bS;
+      return (a[0] ?? '').localeCompare(b[0] ?? '');
+    }));
   }
 
   /**
@@ -231,14 +237,14 @@ export class CollisionLayoutEngine {
 
       // minTaskWidth를 고려한 실제 종료 X 계산
       const actualWidth = Math.max(this.options.minTaskWidth, naturalWidth);
-      const endX = startX + actualWidth + this.options.horizontalPadding;
-      const effectiveStartX = startX - this.options.horizontalPadding;
+      // 겹침 판정은 실제 task 범위 기준 (padding 없이)
+      const endX = startX + actualWidth;
 
       // 사용 가능한 행 찾기 (가장 빨리 끝나는 행)
       let assignedRow = -1;
 
       for (let row = 0; row < rowEndTimes.length; row++) {
-        if (rowEndTimes[row] <= effectiveStartX) {
+        if (rowEndTimes[row] <= startX) {
           assignedRow = row;
           break;
         }
