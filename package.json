@@ -43,17 +43,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "lit": "^3.3.2"
+    "lit": "^3.3.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@types/node": "^25.6.2",
+    "@types/node": "^25.8.0",
     "eslint": "^9.39.4",
-    "eslint-plugin-lit": "^2.2.1",
+    "eslint-plugin-lit": "^2.3.1",
     "globals": "^17.6.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.11",
+    "typescript-eslint": "^8.59.3",
+    "vite": "^8.0.13",
     "vite-plugin-dts": "^5.0.0"
   }
 }
