@@ -156,6 +156,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   private dragState: DragState<T> | null = null;
   private collapsedContexts: Set<string> = new Set();
   private resizeObserver: ResizeObserver | null = null;
+  // @ts-ignore
   private _taskClickedInThisGesture: boolean = false;
 
   // =========================================================================
