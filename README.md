@@ -116,8 +116,11 @@ type Task = {
   id: string
   start: Date
   end: Date
-  dimensionValue: string
+  dimensions: Record<string, string | string[]>  // dimension name -> value(s)
   label?: string
+  color?: string
+  status?: 'pending' | 'in-progress' | 'completed' | 'cancelled'
+  progress?: number  // 0-100
   metadata?: Record<string, any>
 }
 ```
