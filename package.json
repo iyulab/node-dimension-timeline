@@ -17,7 +17,7 @@
   "author": "iyulab",
   "repository": {
     "type": "git",
-    "url": "https://github.com/iyulab/dimension-timeline.git"
+    "url": "https://github.com/iyulab/node-dimension-timeline.git"
   },
   "files": [
     "dist",
