@@ -157,6 +157,7 @@ export class DimensionSelector extends LitElement {
             <input
               type="text"
               class="search-input"
+              aria-label="검색"
               placeholder="검색..."
               .value=${this.searchQuery}
               @input=${this.handleSearchInput}
