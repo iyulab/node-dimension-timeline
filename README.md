@@ -5,6 +5,36 @@
 
 ---
 
+## 설치와 사용
+
+```bash
+npm install @iyulab/dimension-timeline
+```
+
+```html
+<d-dimension-timeline id="timeline"></d-dimension-timeline>
+
+<script type="module">
+  import { ArrayDataSource } from '@iyulab/dimension-timeline'; // 가져오면 <d-dimension-timeline> 이 등록된다
+
+  const timeline = document.getElementById('timeline');
+  timeline.dataSource = new ArrayDataSource([
+    { id: 't1', start: new Date('2026-10-01T09:00'), end: new Date('2026-10-01T12:00'),
+      dimensions: { project: 'A', worker: 'Kim' }, label: '조립' },
+  ]);
+  timeline.dimensions = [
+    { key: 'project', label: '프로젝트' },
+    { key: 'worker', label: '작업자' },
+  ];
+  timeline.activeDimension = 'project';
+  timeline.scale = 'hour';
+</script>
+```
+
+`lit` 3 이 의존성으로 함께 설치된다. 동작하는 전체 예는 `demo/index.html` 에 있다.
+
+---
+
 ## 핵심 개념
 
 * 행(row)은 데이터 의미가 아님

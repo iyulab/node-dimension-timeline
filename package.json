@@ -2,7 +2,6 @@
   "name": "@iyulab/dimension-timeline",
   "description": "A timeline component for visualizing tasks across customizable dimensions with collision-aware layout",
   "version": "0.1.0",
-  "private": true,
   "keywords": [
     "iyulab",
     "timeline",
