@@ -5,3 +5,4 @@
 export * from './DateUtils.js';
 export * from './CanvasUtils.js';
 export * from './IntervalTree.js';
+export * from './Labels.js';

@@ -7,8 +7,9 @@ import { html, PropertyValues, nothing, LitElement, CSSResultGroup } from 'lit';
 import { property, state } from 'lit/decorators.js';
 
 import { styles } from './TimeAxis.styles.js';
-import type { TimeScaleUnit, TimeRange } from '../../types/index.js';
-import { formatDate, floorToUnit, addUnit, today } from '../../utilities/DateUtils.js';
+import type { TimeScaleUnit, TimeRange, TimelineLabels } from '../../types/index.js';
+import { floorToUnit, addUnit, today } from '../../utilities/DateUtils.js';
+import { defaultAxisLabel } from '../../utilities/Labels.js';
 
 /**
  * 시간 라벨 정보
@@ -38,6 +39,10 @@ export class TimeAxis extends LitElement {
   // =========================================================================
 
   /** 현재 스케일 단위 */
+  /** 눈금 문구 — 부모가 `labels.axisLabel` 을 넘긴다 */
+  @property({ attribute: false })
+  axisLabel: TimelineLabels['axisLabel'] = defaultAxisLabel;
+
   @property({ type: String })
   scale: TimeScaleUnit = 'day';
 
@@ -191,7 +196,7 @@ export class TimeAxis extends LitElement {
           date: current,
           x,
           width,
-          text: this.formatLabel(current, unit, primary),
+          text: this.axisLabel(current, unit, primary),
           major: primary,
         });
       }
@@ -225,45 +230,6 @@ export class TimeAxis extends LitElement {
         return { primaryUnit: 'month', secondaryUnit: 'week' };
       default:
         return { primaryUnit: 'week', secondaryUnit: 'day' };
-    }
-  }
-
-  private formatLabel(date: Date, unit: TimeScaleUnit, primary: boolean): string {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-
-    if (primary) {
-      switch (unit) {
-        case 'hour':
-          return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}시`;
-        case 'day':
-          return `${date.getMonth() + 1}월 ${date.getDate()}일`;
-        case 'week':
-          return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-        case 'month':
-          return `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
-        default:
-          return formatDate(date, unit);
-      }
-    } else {
-      switch (unit) {
-        case '10min':
-          return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-        case '30min':
-          return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-        case 'hour':
-          return `${date.getHours()}:00`;
-        case '6hour':
-          return `${pad(date.getHours())}:00`;
-        case '12hour':
-          return `${date.getHours() < 12 ? '오전' : '오후'} ${date.getHours() % 12 || 12}시`;
-        case 'day':
-          return `${date.getDate()} (${dayNames[date.getDay()]})`;
-        case 'week':
-          return `${date.getMonth() + 1}/${date.getDate()}주`;
-        default:
-          return formatDate(date, unit);
-      }
     }
   }
 

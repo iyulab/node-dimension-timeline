@@ -129,6 +129,32 @@ export interface TimeRegion {
 export type TimeScaleUnit = '10min' | '30min' | 'hour' | '6hour' | '12hour' | 'day' | 'week' | 'month';
 
 /**
+ * 컴포넌트가 스스로 그리는 문구 전부 — 앱이 `labels` 로 일부만 바꿔 넘긴다(넘기지 않은 키는 기본값).
+ * 기본값은 `DEFAULT_TIMELINE_LABELS`(한국어).
+ */
+export interface TimelineLabels {
+  /** Dimension 고르기의 머리 */
+  dimension: string;
+  /** 고른 Dimension 이 없을 때 */
+  select: string;
+  /** 검색 칸의 접근 가능한 이름 */
+  search: string;
+  /** 검색 칸 자리표시 */
+  searchPlaceholder: string;
+  /** 값이 없을 때 */
+  empty: string;
+  /** 검색 결과가 없을 때 */
+  noResults: string;
+  /** 확대 · 축소 단추 이름 */
+  zoomIn: string;
+  zoomOut: string;
+  /** 스케일 표시 */
+  scales: Record<TimeScaleUnit, string>;
+  /** 시간축 눈금 문구 — `primary` 는 위 줄(큰 단위) */
+  axisLabel: (date: Date, unit: TimeScaleUnit, primary: boolean) => string;
+}
+
+/**
  * 시간 스케일 설정
  */
 export interface TimeScaleConfig {

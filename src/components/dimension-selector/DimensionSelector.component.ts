@@ -7,7 +7,8 @@ import { html, PropertyValues, nothing, LitElement, CSSResultGroup } from 'lit';
 import { property, state } from 'lit/decorators.js';
 
 import { styles } from './DimensionSelector.styles.js';
-import type { Dimension, DimensionValue } from '../../types/index.js';
+import type { Dimension, DimensionValue, TimelineLabels } from '../../types/index.js';
+import { DEFAULT_TIMELINE_LABELS } from '../../utilities/Labels.js';
 
 /**
  * Dimension 값과 카운트
@@ -87,6 +88,10 @@ export class DimensionSelector extends LitElement {
   @property({ type: Number, attribute: 'zoom-y' })
   zoomY: number = 1.0;
 
+  /** 내장 문구 — 부모가 병합한 값을 넘긴다 */
+  @property({ attribute: false })
+  labels: TimelineLabels = DEFAULT_TIMELINE_LABELS;
+
   /** 선택된 Dimension 값 (row 강조용) */
   @property({ type: String, attribute: 'selected-dimension-value' })
   selectedDimensionValue: string | null = null;
@@ -148,7 +153,7 @@ export class DimensionSelector extends LitElement {
     return html`
       ${!this.syncMode ? html`
         <div class="selector-header">
-          <span class="selector-title">Dimension</span>
+          <span class="selector-title">${this.labels.dimension}</span>
           ${this.showDimensionDropdown ? this.renderDropdown(activeDim) : nothing}
         </div>
 
@@ -157,8 +162,8 @@ export class DimensionSelector extends LitElement {
             <input
               type="text"
               class="search-input"
-              aria-label="검색"
-              placeholder="검색..."
+              aria-label=${this.labels.search}
+              placeholder=${this.labels.searchPlaceholder}
               .value=${this.searchQuery}
               @input=${this.handleSearchInput}
             />
@@ -201,7 +206,7 @@ export class DimensionSelector extends LitElement {
           `;
         }) : html`
           <div class="empty-state">
-            ${this.searchQuery ? '검색 결과가 없습니다' : '값이 없습니다'}
+            ${this.searchQuery ? this.labels.noResults : this.labels.empty}
           </div>
         `}
       </div>
@@ -212,7 +217,7 @@ export class DimensionSelector extends LitElement {
     return html`
       <div class="selector-dropdown">
         <button class="dropdown-trigger" @click=${this.toggleDropdown}>
-          <span>${activeDim?.label ?? '선택'}</span>
+          <span>${activeDim?.label ?? this.labels.select}</span>
           <svg class="icon" viewBox="0 0 12 12" fill="currentColor">
             <path d="M2 4l4 4 4-4H2z"/>
           </svg>

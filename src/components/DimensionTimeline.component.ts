@@ -7,7 +7,7 @@ import { property, state, query } from 'lit/decorators.js';
 
 import { styles } from './DimensionTimeline.styles.js';
 import type {
-  Task, Dimension, TimeScaleUnit, TimeRegion,
+  Task, Dimension, TimeScaleUnit, TimeRegion, TimelineLabels,
   DragState, HitArea,
 } from '../types/index.js';
 import type { DataSource } from '../data/DataSource.js';
@@ -21,6 +21,7 @@ import { DimensionSelector, type DimensionValueWithCount } from './dimension-sel
 import { ContextSlice } from './context-slice/ContextSlice.component.js';
 import type { GridLine, RenderedTimeRegion, ContextColorInfo } from '../core/TaskRenderer.js';
 import { snapToUnit } from '../utilities/DateUtils.js';
+import { resolveLabels } from '../utilities/Labels.js';
 
 /**
  * DimensionTimeline 컴포넌트
@@ -117,6 +118,14 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   /** 타임 영역 목록 (공휴일, 근무시간대 등) */
   @property({ attribute: false })
   timeRegions: TimeRegion[] = [];
+
+  /** 내장 문구 — 바꿀 키만 넘긴다(나머지는 기본값 · `DEFAULT_TIMELINE_LABELS`) */
+  @property({ attribute: false })
+  labels: Partial<TimelineLabels> = {};
+
+  /** 좌상단 Dimension 고르기를 숨긴다 — 앱이 자기 고르기로 `active-dimension` 을 정할 때 */
+  @property({ type: Boolean, attribute: 'hide-dimension-dropdown' })
+  hideDimensionDropdown: boolean = false;
 
   /** 실시간 현재시간 마커 업데이트 간격 (ms, 0이면 비활성화) */
   @property({ type: Number, attribute: 'realtime-interval' })
@@ -321,16 +330,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   // =========================================================================
 
   render() {
-    const scaleLabels: Record<TimeScaleUnit, string> = {
-      '10min': '10분',
-      '30min': '30분',
-      'hour': '시간',
-      '6hour': '6시간',
-      '12hour': '12시간',
-      'day': '일',
-      'week': '주',
-      'month': '월',
-    };
+    const labels = resolveLabels(this.labels);
 
     const activeDim = this.dimensions.find(d => d.key === this.activeDimension);
 
@@ -338,10 +338,11 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       <div class="timeline-container">
         <!-- 좌상단 코너: Dimension 선택 드롭다운 -->
         <div class="corner-header">
+          ${this.hideDimensionDropdown ? nothing : html`
           <div class="dimension-dropdown">
             <button class="dropdown-trigger" @click=${this.toggleDimensionDropdown}>
-              <span class="dropdown-label">Dimension</span>
-              <span class="dropdown-value">${activeDim?.label ?? '선택'}</span>
+              <span class="dropdown-label">${labels.dimension}</span>
+              <span class="dropdown-value">${activeDim?.label ?? labels.select}</span>
               <svg class="dropdown-icon" viewBox="0 0 12 12" fill="currentColor">
                 <path d="M2 4l4 4 4-4H2z"/>
               </svg>
@@ -365,6 +366,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
               </div>
             ` : nothing}
           </div>
+          `}
           <slot name="corner-header"></slot>
         </div>
 
@@ -376,6 +378,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
             .pixelsPerUnit=${this.viewportManager.timeScale.pixelsPerUnit}
             .scrollX=${this.viewportManager.scrollX}
             .nowX=${this.nowX}
+            .axisLabel=${labels.axisLabel}
           ></d-time-axis>
         </div>
 
@@ -390,6 +393,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
             .zoomY=${this.viewportManager.zoomY}
             .contextColors=${this.getContextColorsMap()}
             .selectedDimensionValue=${this.selectedDimensionValue}
+            .labels=${labels}
             ?sync-mode=${this.contextPositions.size > 0}
             @dimension-change=${this.handleDimensionChange}
             @dimension-value-click=${this.handleDimensionValueClick}
@@ -424,12 +428,12 @@ export class DimensionTimeline<T = unknown> extends LitElement {
           <!-- 줌 컨트롤 -->
           ${this.zoomable ? html`
             <div class="zoom-controls">
-              <button class="zoom-button" @click=${this.handleZoomIn} title="확대">
+              <button class="zoom-button" @click=${this.handleZoomIn} title=${labels.zoomIn} aria-label=${labels.zoomIn}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 3v10M3 8h10"/>
                 </svg>
               </button>
-              <button class="zoom-button" @click=${this.handleZoomOut} title="축소">
+              <button class="zoom-button" @click=${this.handleZoomOut} title=${labels.zoomOut} aria-label=${labels.zoomOut}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M3 8h10"/>
                 </svg>
@@ -438,7 +442,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
           ` : nothing}
 
           <!-- 스케일 인디케이터 -->
-          <div class="scale-indicator">${scaleLabels[this.scale]}</div>
+          <div class="scale-indicator">${labels.scales[this.scale]}</div>
         </div>
       </div>
     `;

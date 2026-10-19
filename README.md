@@ -33,6 +33,24 @@ npm install @iyulab/dimension-timeline
 
 `lit` 3 이 의존성으로 함께 설치된다. 동작하는 전체 예는 `demo/index.html` 에 있다.
 
+### 문구 바꾸기
+
+컴포넌트가 스스로 그리는 문구(머리 · 검색 · 빈 목록 · 확대/축소 · 스케일 · 시간축 눈금)는 `labels` 로 바꾼다 —
+바꿀 키만 넘기고 나머지는 기본값(`DEFAULT_TIMELINE_LABELS` — 한국어)을 쓴다.
+
+```js
+timeline.labels = {
+  dimension: 'Group by',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  scales: { day: 'Day', week: 'Week' },
+  axisLabel: (date, unit, primary) =>
+    primary ? date.toLocaleDateString('en', { month: 'short', year: 'numeric' }) : String(date.getDate()),
+};
+```
+
+앱이 자기 고르기로 `activeDimension` 을 정하면 좌상단의 내장 고르기를 `hide-dimension-dropdown` 으로 숨긴다.
+
 ---
 
 ## 핵심 개념
