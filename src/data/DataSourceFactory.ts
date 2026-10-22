@@ -80,8 +80,8 @@ export class DataSourceFactory {
     const dimensionKeys = Object.keys(dimensions);
 
     const labels = [
-      '회의', '개발', '테스트', '배포', '리뷰', '설계',
-      '분석', '문서화', '데모', '점검', '유지보수', '교육',
+      'Meeting', 'Development', 'Testing', 'Deployment', 'Review', 'Design',
+      'Analysis', 'Documentation', 'Demo', 'Inspection', 'Maintenance', 'Training',
     ];
 
     const statuses: Array<'pending' | 'in-progress' | 'completed' | 'cancelled'> = [

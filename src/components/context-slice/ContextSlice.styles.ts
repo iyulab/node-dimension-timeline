@@ -6,7 +6,7 @@ export const styles = css`
     position: relative;
     border-bottom: 1px solid var(--context-border, #e2e8f0);
     background: var(--context-bg, #ffffff);
-    transition: background-color 0.15s ease;
+    transition: background-color var(--u-duration-fast, 0.15s) ease;
   }
 
   :host([collapsed]) {
@@ -36,7 +36,7 @@ export const styles = css`
     width: 16px;
     height: 16px;
     color: var(--context-icon-color, #64748b);
-    transition: transform 0.2s ease;
+    transition: transform var(--u-duration-normal, 0.2s) ease;
   }
 
   :host([collapsed]) .collapse-icon {
@@ -70,7 +70,7 @@ export const styles = css`
   .context-content {
     position: relative;
     overflow: hidden;
-    transition: height 0.2s ease;
+    transition: height var(--u-duration-normal, 0.2s) ease;
   }
 
   :host([collapsed]) .context-content {

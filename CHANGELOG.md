@@ -2,6 +2,28 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **The built-in text defaults to English** (`DEFAULT_TIMELINE_LABELS`). The Korean text ships with the package and
+  is chosen with `locale="ko"`; with `locale` empty, the component follows the nearest `lang` (including the
+  document's), so a page with `<html lang="ko">` keeps the Korean text. To keep Korean on a page without `lang`, set
+  `locale="ko"`.
+- The sample data from `DataSourceFactory` uses English task names.
+- Transition durations read `--u-duration-*` and the dimension menu reads `--u-layer-floating`, each falling back to
+  the previous value — with the `@iyulab/components` theme loaded, they follow its timing and reduced-motion setting.
+
+### Added
+
+- `locale` — the language of the built-in text. `registerTimelineLabels(locale, labels)` adds a language;
+  `resolveLabels(labels, locale)` takes the locale as its second argument.
+- Typed `addEventListener` / `removeEventListener` overloads for the `timeline-*` events (`TimelineEventMap`).
+
+### Fixed
+
+- The published package now declares `sideEffects`, so bundlers keep the modules that register the custom elements
+  and can tree-shake the rest. It also declares `engines.node` and ships this changelog.
+- Comments inside the component stylesheets are no longer shipped in `dist`.
+
 ## [0.2.0] - 2026-10-19
 
 ### Added

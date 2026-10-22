@@ -130,7 +130,7 @@ export type TimeScaleUnit = '10min' | '30min' | 'hour' | '6hour' | '12hour' | 'd
 
 /**
  * 컴포넌트가 스스로 그리는 문구 전부 — 앱이 `labels` 로 일부만 바꿔 넘긴다(넘기지 않은 키는 기본값).
- * 기본값은 `DEFAULT_TIMELINE_LABELS`(한국어).
+ * 기본값은 `DEFAULT_TIMELINE_LABELS`(영어) — 로캘 문구는 `registerTimelineLabels()` 로 등록한다(한국어 내장).
  */
 export interface TimelineLabels {
   /** Dimension 고르기의 머리 */

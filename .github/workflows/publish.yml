@@ -18,9 +18,9 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
@@ -56,9 +56,25 @@ jobs:
         if: steps.check.outputs.exists == 'false'
         run: npm version "${{ steps.version.outputs.value }}" --no-git-tag-version --allow-same-version
 
+      # Pack first and check the tarball that will be published - a module the source
+      # registers can drop out of the packed files while the local build looks fine.
+      - name: Pack
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          dest="${RUNNER_TEMP}/pack"
+          mkdir -p "${dest}"
+          tgz=$(npm pack --pack-destination "${dest}" --silent | tail -n 1)
+          tar -xzf "${dest}/${tgz}" -C "${dest}"
+          echo "PACKED_TARBALL=${dest}/${tgz}" >> "$GITHUB_ENV"
+          echo "PACKED_DIR=${dest}/package" >> "$GITHUB_ENV"
+
+      - name: Verify packed tarball
+        if: steps.check.outputs.exists == 'false'
+        run: node .github/scripts/verify-packed.mjs
+
       - name: Publish
         if: steps.check.outputs.exists == 'false'
-        run: npm publish --access public
+        run: npm publish "${PACKED_TARBALL}" --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

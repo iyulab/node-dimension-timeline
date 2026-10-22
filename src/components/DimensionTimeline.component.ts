@@ -11,6 +11,7 @@ import type {
   DragState, HitArea,
 } from '../types/index.js';
 import type { DataSource } from '../data/DataSource.js';
+import type { TimelineEventMap } from '../events/TimelineEvents.js';
 import type { LayoutResult } from '../core/CollisionLayoutEngine.js';
 import { ViewportManager } from '../core/ViewportManager.js';
 import { CollisionLayoutEngine } from '../core/CollisionLayoutEngine.js';
@@ -119,9 +120,16 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   @property({ attribute: false })
   timeRegions: TimeRegion[] = [];
 
-  /** 내장 문구 — 바꿀 키만 넘긴다(나머지는 기본값 · `DEFAULT_TIMELINE_LABELS`) */
+  /** 내장 문구 — 바꿀 키만 넘긴다(나머지는 `locale` 의 등록 문구, 없으면 영어 기본값 `DEFAULT_TIMELINE_LABELS`) */
   @property({ attribute: false })
   labels: Partial<TimelineLabels> = {};
+
+  /**
+   * 내장 문구의 로캘(`ko` · `ko-KR` …) — 비우면 가장 가까운 조상의 `lang`, 그것도 없으면 문서의 `lang`.
+   * 등록된 로캘이 아니면 영어 기본값. 문구 등록은 `registerTimelineLabels()`.
+   */
+  @property({ type: String })
+  locale: string = '';
 
   /** 좌상단 Dimension 고르기를 숨긴다 — 앱이 자기 고르기로 `active-dimension` 을 정할 때 */
   @property({ type: Boolean, attribute: 'hide-dimension-dropdown' })
@@ -330,7 +338,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   // =========================================================================
 
   render() {
-    const labels = resolveLabels(this.labels);
+    const labels = resolveLabels(this.labels, this.locale || this.closest('[lang]')?.getAttribute('lang') || undefined);
 
     const activeDim = this.dimensions.find(d => d.key === this.activeDimension);
 
@@ -1065,4 +1073,14 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     }
     return map;
   }
+}
+
+// 타입 있는 리스너 — DOM 의 `HTMLMediaElementEventMap` 과 같은 방식. 병합된 오버로드는 EventTarget 이 구현한다.
+export interface DimensionTimeline<T = unknown> {
+  addEventListener<K extends keyof TimelineEventMap>(type: K, listener: (this: DimensionTimeline<T>, ev: TimelineEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: DimensionTimeline<T>, ev: HTMLElementEventMap[K]) => unknown, options?: boolean | AddEventListenerOptions): void;
+  addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+  removeEventListener<K extends keyof TimelineEventMap>(type: K, listener: (this: DimensionTimeline<T>, ev: TimelineEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: DimensionTimeline<T>, ev: HTMLElementEventMap[K]) => unknown, options?: boolean | EventListenerOptions): void;
+  removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
 }

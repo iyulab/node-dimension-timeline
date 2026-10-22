@@ -33,16 +33,27 @@ npm install @iyulab/dimension-timeline
 
 `lit` 3 이 의존성으로 함께 설치된다. 동작하는 전체 예는 `demo/index.html` 에 있다.
 
-### 문구 바꾸기
+### 문구와 로캘
 
-컴포넌트가 스스로 그리는 문구(머리 · 검색 · 빈 목록 · 확대/축소 · 스케일 · 시간축 눈금)는 `labels` 로 바꾼다 —
-바꿀 키만 넘기고 나머지는 기본값(`DEFAULT_TIMELINE_LABELS` — 한국어)을 쓴다.
+컴포넌트가 스스로 그리는 문구(머리 · 검색 · 빈 목록 · 확대/축소 · 스케일 · 시간축 눈금)의 기본값은 영어
+(`DEFAULT_TIMELINE_LABELS`)다. 한국어는 함께 실려 있어 `locale="ko"` 로 고른다 — `locale` 을 비우면 가장 가까운
+조상(문서 포함)의 `lang` 을 따른다(`<html lang="ko">` 면 한국어). 다른 로캘은 `registerTimelineLabels()` 로 더한다.
+
+```html
+<d-dimension-timeline locale="ko"></d-dimension-timeline>
+```
+
+```js
+import { registerTimelineLabels } from '@iyulab/dimension-timeline';
+
+registerTimelineLabels('ja', { select: '選択', zoomIn: '拡大', zoomOut: '縮小' });
+```
+
+한 화면만 바꿀 때는 `labels` 로 키 단위로 덮는다 — 넘긴 키만 로캘 문구 위에 얹힌다.
 
 ```js
 timeline.labels = {
   dimension: 'Group by',
-  zoomIn: 'Zoom in',
-  zoomOut: 'Zoom out',
   scales: { day: 'Day', week: 'Week' },
   axisLabel: (date, unit, primary) =>
     primary ? date.toLocaleDateString('en', { month: 'short', year: 'numeric' }) : String(date.getDate()),

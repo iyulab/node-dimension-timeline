@@ -20,6 +20,7 @@
   },
   "files": [
     "dist",
+    "CHANGELOG.md",
     "LICENSE",
     "README.md",
     "package.json"
@@ -36,6 +37,13 @@
       "import": "./dist/*"
     }
   },
+  "sideEffects": [
+    "./dist/components/**/*.js",
+    "./src/components/**/*.ts"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "preversion": "node -e \"if(require('fs').existsSync('../../scripts/preversion-check.mjs'))require('child_process').execFileSync('node',['../../scripts/preversion-check.mjs'],{stdio:'inherit'})\"",
     "start": "vite --force",
@@ -47,6 +55,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@iyulab/components": "^2.31.0",
     "@types/node": "^26.1.1",
     "eslint": "^10.1.0",
     "eslint-plugin-lit": "^2.3.1",
