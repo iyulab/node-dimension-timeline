@@ -23,6 +23,7 @@
 
 ### Fixed
 
+- `CollisionLayoutEngine.layout()` with no tasks reports a `totalHeight` of 0 instead of minus one gap.
 - The published package now declares `sideEffects`, so bundlers keep the modules that register the custom elements
   and can tree-shake the rest. It also declares `engines.node` and ships this changelog.
 - Comments inside the component stylesheets are no longer shipped in `dist`.

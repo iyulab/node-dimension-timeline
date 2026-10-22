@@ -136,7 +136,8 @@ export class CollisionLayoutEngine {
 
     return {
       contexts,
-      totalHeight: currentY - scaledTaskGap,
+      // 문맥 사이에만 간격이 있다 — 문맥이 없으면 0(간격 하나를 빼 음수가 되지 않게)
+      totalHeight: contexts.length > 0 ? currentY - scaledTaskGap : 0,
       layoutTime: performance.now() - startTime,
     };
   }
@@ -240,7 +241,7 @@ export class CollisionLayoutEngine {
       // 겹침 판정은 실제 task 범위 기준 (padding 없이)
       const endX = startX + actualWidth;
 
-      // 사용 가능한 행 찾기 (가장 빨리 끝나는 행)
+      // 사용 가능한 행 찾기 (비어 있는 가장 위 행 — 시작 순으로 놓으므로 행 수는 가장 깊은 겹침과 같다)
       let assignedRow = -1;
 
       for (let row = 0; row < rowEndTimes.length; row++) {
