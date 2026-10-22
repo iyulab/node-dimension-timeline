@@ -5,7 +5,7 @@
 
 ---
 
-## 설치와 사용
+## 빠른 시작
 
 ```bash
 npm install @iyulab/dimension-timeline
