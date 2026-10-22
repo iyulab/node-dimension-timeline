@@ -13,7 +13,7 @@ import type {
 import type { DataSource } from '../data/DataSource.js';
 import type { TimelineEventMap } from '../events/TimelineEvents.js';
 import type { LayoutResult } from '../core/CollisionLayoutEngine.js';
-import { ViewportManager } from '../core/ViewportManager.js';
+import { ViewportManager, type ViewportChangeEvent } from '../core/ViewportManager.js';
 import { CollisionLayoutEngine } from '../core/CollisionLayoutEngine.js';
 import { IncrementalUpdater, LayoutCache } from '../core/IncrementalUpdater.js';
 import { TimelineCanvas } from './timeline-canvas/TimelineCanvas.component.js';
@@ -27,6 +27,7 @@ import { resolveLabels } from '../utilities/Labels.js';
 /**
  * DimensionTimeline 컴포넌트
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging -- typed event listeners (the interface below): the merged overloads are implemented by EventTarget
 export class DimensionTimeline<T = unknown> extends LitElement {
   static styles: CSSResultGroup = styles;
 
@@ -173,8 +174,6 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   private dragState: DragState<T> | null = null;
   private collapsedContexts: Set<string> = new Set();
   private resizeObserver: ResizeObserver | null = null;
-  // @ts-ignore
-  private _taskClickedInThisGesture: boolean = false;
 
   // =========================================================================
   // Lifecycle
@@ -633,7 +632,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   // Event Handlers
   // =========================================================================
 
-  private handleViewportChange(event: any): void {
+  private handleViewportChange(event: ViewportChangeEvent): void {
     this.updateGridLines();
     this.updateRenderedTimeRegions();
     this.nowX = this.viewportManager.dateToX(new Date());
@@ -699,9 +698,6 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     const { task, area, dimensionValue, x, y, originalEvent } = e.detail;
 
     if (originalEvent.button !== 0) return; // 좌클릭만
-
-    // task 클릭 플래그 (mouseup에서 빈 영역 선택 해제 방지)
-    this._taskClickedInThisGesture = true;
 
     // 선택
     this.selectTask(task.id);

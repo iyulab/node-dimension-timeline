@@ -23,6 +23,8 @@
 
 ### Fixed
 
+- `IntervalTree.delete()` could miss an interval whose start equals another's once the tree had rebalanced, and
+  with identical intervals it could remove a different one than the predicate named.
 - `CollisionLayoutEngine.layout()` with no tasks reports a `totalHeight` of 0 instead of minus one gap.
 - The published package now declares `sideEffects`, so bundlers keep the modules that register the custom elements
   and can tree-shake the rest. It also declares `engines.node` and ships this changelog.

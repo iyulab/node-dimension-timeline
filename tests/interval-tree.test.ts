@@ -33,6 +33,25 @@ describe('IntervalTree', () => {
     expect(ids(tree.getAll())).toEqual(['x']);
   });
 
+  test('deletes every one of many intervals that share a start (rotations move equal starts to the left)', () => {
+    const tree = new IntervalTree<string>();
+    for (let i = 0; i < 20; i++) tree.insert({ start: 5, end: 10 + i, data: `e${i}` });
+    const missed: string[] = [];
+    for (let i = 0; i < 20; i++) if (!tree.delete({ start: 5, end: 10 + i })) missed.push(`e${i}`);
+    expect(missed).toEqual([]);
+    expect(tree.size).toBe(0);
+    expect(tree.getAll()).toEqual([]);
+  });
+
+  test('deletes the named one of identical intervals, and keeps the others intact', () => {
+    const tree = new IntervalTree<string>();
+    for (let i = 0; i < 10; i++) tree.insert({ start: i % 3, end: 50, data: `d${i}` });
+    const deleted = [0, 3, 6, 9, 1].map((i) => tree.delete({ start: i % 3, end: 50 }, (d) => d === `d${i}`));
+    expect(deleted.every(Boolean)).toBe(true);
+    expect(ids(tree.getAll())).toEqual(['d2', 'd4', 'd5', 'd7', 'd8']);
+    expect(ids(tree.query({ start: 40, end: 41 }))).toEqual(['d2', 'd4', 'd5', 'd7', 'd8']);
+  });
+
   test('NEGATIVE: deleting what is not there reports false and changes nothing', () => {
     const tree = new IntervalTree<string>();
     tree.insert({ start: 0, end: 5, data: 'x' });

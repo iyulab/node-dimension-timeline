@@ -334,8 +334,10 @@ export class InteractionManager<T = unknown> {
           };
         }
         // 뷰포트 팬
-        const panAmount = e.shiftKey ? 100 : 50;
-        viewportManager.scrollBy(e.key === 'ArrowLeft' ? -panAmount : panAmount, 0);
+        {
+          const panAmount = e.shiftKey ? 100 : 50;
+          viewportManager.scrollBy(e.key === 'ArrowLeft' ? -panAmount : panAmount, 0);
+        }
         return { handled: true, action: 'navigate' };
 
       case 'ArrowUp':

@@ -153,7 +153,7 @@ export class IntervalTree<T> {
       return { node: null, deleted: false };
     }
 
-    let deleted = false;
+    let deleted: boolean;
 
     if (interval.start < node.interval.start) {
       const result = this.deleteNode(node.left, interval, predicate);
@@ -163,31 +163,30 @@ export class IntervalTree<T> {
       const result = this.deleteNode(node.right, interval, predicate);
       node.right = result.node;
       deleted = result.deleted;
+    } else if (interval.end === node.interval.end && (!predicate || predicate(node.interval.data))) {
+      // 삭제 대상 노드 발견
+      if (node.left === null) {
+        return { node: node.right, deleted: true };
+      }
+      if (node.right === null) {
+        return { node: node.left, deleted: true };
+      }
+
+      // 두 자식이 있는 경우: 오른쪽 서브트리의 최소 노드를 떼어 그 자리에 둔다 — 구간으로 다시 찾지 않는다
+      // (같은 구간이 여럿이면 다른 노드를 지운다)
+      const removed = this.removeMin(node.right);
+      node.interval = removed.min;
+      node.right = removed.node;
+      deleted = true;
     } else {
-      // start가 같은 경우, end와 predicate 확인
-      const matches = interval.end === node.interval.end &&
-        (!predicate || predicate(node.interval.data));
-
-      if (matches) {
-        // 삭제 대상 노드 발견
-        if (node.left === null) {
-          return { node: node.right, deleted: true };
-        }
-        if (node.right === null) {
-          return { node: node.left, deleted: true };
-        }
-
-        // 두 자식이 있는 경우: 오른쪽 서브트리의 최소값으로 대체
-        const minNode = this.findMin(node.right);
-        node.interval = minNode.interval;
-        const result = this.deleteNode(node.right, minNode.interval);
-        node.right = result.node;
-        deleted = true;
-      } else {
-        // 같은 start를 가진 다른 노드일 수 있음
-        const result = this.deleteNode(node.right, interval, predicate);
-        node.right = result.node;
-        deleted = result.deleted;
+      // 같은 start 는 회전 뒤 왼쪽에도 있을 수 있다 — 양쪽을 본다
+      const left = this.deleteNode(node.left, interval, predicate);
+      node.left = left.node;
+      deleted = left.deleted;
+      if (!deleted) {
+        const right = this.deleteNode(node.right, interval, predicate);
+        node.right = right.node;
+        deleted = right.deleted;
       }
     }
 
@@ -200,6 +199,18 @@ export class IntervalTree<T> {
     node.height = 1 + Math.max(this.height(node.left), this.height(node.right));
 
     return { node: this.balance(node), deleted: true };
+  }
+
+  /** 가장 왼쪽 노드를 떼어 낸다 — 남은 서브트리와 떼어 낸 구간. */
+  private removeMin(node: TreeNode<T>): { node: TreeNode<T> | null; min: IntervalWithData<T> } {
+    if (node.left === null) {
+      return { node: node.right, min: node.interval };
+    }
+    const result = this.removeMin(node.left);
+    node.left = result.node;
+    this.updateMax(node);
+    node.height = 1 + Math.max(this.height(node.left), this.height(node.right));
+    return { node: this.balance(node), min: result.min };
   }
 
   private queryNode(
@@ -313,14 +324,6 @@ export class IntervalTree<T> {
 
   private overlaps(a: Interval, b: Interval): boolean {
     return a.start < b.end && a.end > b.start;
-  }
-
-  private findMin(node: TreeNode<T>): TreeNode<T> {
-    let current = node;
-    while (current.left !== null) {
-      current = current.left;
-    }
-    return current;
   }
 
   private inorderTraverse(

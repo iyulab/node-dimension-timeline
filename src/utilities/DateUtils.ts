@@ -59,13 +59,14 @@ export function floorToUnit(date: Date, unit: TimeScaleUnit): Date {
     case 'day':
       d.setHours(0, 0, 0, 0);
       break;
-    case 'week':
+    case 'week': {
       d.setHours(0, 0, 0, 0);
       // 주 시작을 월요일로 설정
       const day = d.getDay();
       const diff = day === 0 ? 6 : day - 1;
       d.setDate(d.getDate() - diff);
       break;
+    }
     case 'month':
       d.setHours(0, 0, 0, 0);
       d.setDate(1);
