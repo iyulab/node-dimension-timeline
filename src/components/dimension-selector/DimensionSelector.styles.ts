@@ -40,7 +40,7 @@ export const styles = css`
     font-size: 12px;
     color: var(--dimension-selector-text, #334155);
     cursor: pointer;
-    transition: all var(--u-duration-fast, 0.15s) ease;
+    transition: all var(--u-duration-fast, 140ms) ease;
   }
 
   .dropdown-trigger:hover {
@@ -52,7 +52,7 @@ export const styles = css`
     width: 12px;
     height: 12px;
     color: var(--dimension-selector-icon, #64748b);
-    transition: transform var(--u-duration-normal, 0.2s) ease;
+    transition: transform var(--u-duration-normal, 220ms) ease;
   }
 
   :host([open]) .dropdown-trigger .icon {
@@ -74,7 +74,7 @@ export const styles = css`
     opacity: 0;
     visibility: hidden;
     transform: translateY(-4px);
-    transition: all var(--u-duration-fast, 0.15s) ease;
+    transition: all var(--u-duration-fast, 140ms) ease;
   }
 
   :host([open]) .dropdown-menu {
@@ -91,7 +91,7 @@ export const styles = css`
     font-size: 13px;
     color: var(--dimension-selector-item-text, #334155);
     cursor: pointer;
-    transition: background-color var(--u-duration-instant, 0.1s) ease;
+    transition: background-color var(--u-duration-instant, 80ms) ease;
   }
 
   .dropdown-item:hover {
@@ -146,7 +146,7 @@ export const styles = css`
     font-size: 13px;
     color: var(--dimension-value-text, #334155);
     cursor: pointer;
-    transition: background-color var(--u-duration-instant, 0.1s) ease;
+    transition: background-color var(--u-duration-instant, 80ms) ease;
     user-select: none;
     box-sizing: border-box;
   }
@@ -195,7 +195,7 @@ export const styles = css`
     border-radius: 4px;
     font-size: 12px;
     outline: none;
-    transition: border-color var(--u-duration-fast, 0.15s) ease;
+    transition: border-color var(--u-duration-fast, 140ms) ease;
   }
 
   .search-input:focus {

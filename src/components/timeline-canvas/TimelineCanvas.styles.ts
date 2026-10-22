@@ -46,7 +46,7 @@ export const styles = css`
     justify-content: center;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--u-duration-normal, 0.2s) ease;
+    transition: opacity var(--u-duration-normal, 220ms) ease;
   }
 
   :host([loading]) .loading-overlay {

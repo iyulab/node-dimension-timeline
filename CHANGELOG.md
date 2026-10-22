@@ -9,8 +9,9 @@
   document's), so a page with `<html lang="ko">` keeps the Korean text. To keep Korean on a page without `lang`, set
   `locale="ko"`.
 - The sample data from `DataSourceFactory` uses English task names.
-- Transition durations read `--u-duration-*` and the dimension menu reads `--u-layer-floating`, each falling back to
-  the previous value — with the `@iyulab/components` theme loaded, they follow its timing and reduced-motion setting.
+- Transition durations read `--u-duration-*` (fallbacks 80 / 140 / 220 ms — before: 100 / 150 / 200 ms) and the
+  dimension menu reads `--u-layer-floating` (1000) — with the `@iyulab/components` theme loaded, they follow its timing
+  and reduced-motion setting.
   `@iyulab/components` (>=1.49.0, the release that added `--u-layer-*`) is an optional peer — nothing changes
   without it.
 

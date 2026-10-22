@@ -52,7 +52,7 @@ export const styles = css`
     border-radius: 6px;
     background: var(--dropdown-bg, #ffffff);
     cursor: pointer;
-    transition: all var(--u-duration-fast, 0.15s) ease;
+    transition: all var(--u-duration-fast, 140ms) ease;
   }
 
   .dropdown-trigger:hover {
@@ -108,7 +108,7 @@ export const styles = css`
     font-size: 13px;
     color: var(--dropdown-item-color, #334155);
     cursor: pointer;
-    transition: background-color var(--u-duration-instant, 0.1s) ease;
+    transition: background-color var(--u-duration-instant, 80ms) ease;
   }
 
   .dropdown-item:hover {
@@ -200,7 +200,7 @@ export const styles = css`
     background: var(--scrollbar-thumb, #cbd5e1);
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color var(--u-duration-fast, 0.15s) ease;
+    transition: background-color var(--u-duration-fast, 140ms) ease;
   }
 
   .scrollbar-thumb:hover {
@@ -228,7 +228,7 @@ export const styles = css`
     background: var(--zoom-button-bg, #ffffff);
     color: var(--zoom-button-color, #475569);
     cursor: pointer;
-    transition: all var(--u-duration-fast, 0.15s) ease;
+    transition: all var(--u-duration-fast, 140ms) ease;
   }
 
   .zoom-button:hover {
@@ -263,7 +263,7 @@ export const styles = css`
     border-radius: 4px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--u-duration-normal, 0.2s) ease;
+    transition: opacity var(--u-duration-normal, 220ms) ease;
     z-index: 50;
   }
 
