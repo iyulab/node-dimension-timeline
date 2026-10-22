@@ -11,6 +11,8 @@
 - The sample data from `DataSourceFactory` uses English task names.
 - Transition durations read `--u-duration-*` and the dimension menu reads `--u-layer-floating`, each falling back to
   the previous value — with the `@iyulab/components` theme loaded, they follow its timing and reduced-motion setting.
+  `@iyulab/components` (>=1.49.0, the release that added `--u-layer-*`) is an optional peer — nothing changes
+  without it.
 
 ### Added
 
