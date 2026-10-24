@@ -92,7 +92,7 @@ export class ContextSlice extends LitElement {
   render() {
     const contentHeight = this.collapsed ? 0 : this.rowCount * this.rowHeight;
 
-    return html`
+    return html`<div class="base" part="base">
       ${this.showHeader ? this.renderHeader() : ''}
       <div
         class="context-content"
@@ -103,7 +103,7 @@ export class ContextSlice extends LitElement {
       >
         <slot></slot>
       </div>
-    `;
+    </div>`;
   }
 
   private renderHeader() {

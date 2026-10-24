@@ -1,6 +1,7 @@
 import { css } from 'lit';
 
 export const styles = css`
+  /* reset-ok: d-time-axis 는 d-dimension-timeline 의 섀도 안에서만 그려진다 — 문서의 전역 리셋이 닿지 않는다. */
   :host {
     display: block;
     position: relative;

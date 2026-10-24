@@ -4,12 +4,15 @@ export const styles = css`
   :host {
     display: block;
     position: relative;
+  }
+  /* 상자(테두리 · 면)는 섀도 안 요소가 그린다 — 호스트에 두면 문서의 전역 리셋(Tailwind preflight 류)이 이긴다. */
+  .base {
     border-bottom: 1px solid var(--context-border, #e2e8f0);
     background: var(--context-bg, #ffffff);
     transition: background-color var(--u-duration-fast, 140ms) ease;
   }
 
-  :host([collapsed]) {
+  :host([collapsed]) .base {
     background: var(--context-collapsed-bg, #f8fafc);
   }
 

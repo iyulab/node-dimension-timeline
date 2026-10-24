@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **The timeline and its context slices keep their borders and backgrounds under a document-wide CSS reset**
+  (Tailwind's preflight and the like). `d-dimension-timeline` draws its box on its own container and `d-context-slice`
+  on a new `base` part, inside the shadow root where a document rule cannot reach them.
+
 ### Changed
 
 - **The built-in text defaults to English** (`DEFAULT_TIMELINE_LABELS`). The Korean text ships with the package and

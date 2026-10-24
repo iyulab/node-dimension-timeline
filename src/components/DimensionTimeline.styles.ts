@@ -8,14 +8,16 @@ export const styles = css`
     height: 100%;
     min-height: 200px;
     font-family: var(--timeline-font-family, system-ui, -apple-system, sans-serif);
+    box-sizing: border-box;
+  }
+
+  /* 상자(테두리 · 면)는 섀도 안 요소가 그린다 — 호스트에 두면 문서의 전역 리셋(Tailwind preflight 류)이 이긴다. */
+  .timeline-container {
+    box-sizing: border-box;
     background: var(--timeline-bg, #ffffff);
     border: 1px solid var(--timeline-border, #e2e8f0);
     border-radius: var(--timeline-border-radius, 8px);
     overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .timeline-container {
     display: grid;
     grid-template-columns: var(--dimension-selector-width, 200px) 1fr;
     grid-template-rows: var(--time-axis-height, 48px) 1fr;
