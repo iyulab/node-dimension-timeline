@@ -168,6 +168,37 @@ Context 내부에서 Task를 배치하는 핵심 엔진입니다.
 
 ---
 
+## 스타일 손잡이 (CSS 사용자 정의 속성)
+
+`d-dimension-timeline` 에 걸면 안쪽까지 내려간다. 값은 모두 폴백이 있어 아무것도 걸지 않아도 그려진다.
+
+**크기** — 뷰포트와 포인터 좌표는 그려진 영역에서 재므로, 바꾸면 줌 · 드래그도 함께 맞는다.
+
+| 속성 | 기본값 | 무엇 |
+|---|---|---|
+| `--time-axis-height` | `48px` | 시간축 행의 높이 |
+| `--dimension-selector-width` | `200px` | 왼쪽 선택기 열의 폭 |
+| `--dimension-selector-min-width` | `150px` | 선택기 요소(`d-dimension-selector`)의 최소 폭 |
+| `--context-header-height` | `32px` | `d-context-slice` 머리글의 높이 |
+| `--context-labels-width` | `0` | 작업 영역 왼쪽의 맥락 라벨 띠 폭 |
+| `--timeline-border-radius` | `8px` | 바깥 모서리 |
+
+**글자** — `--timeline-font-family`(기본 `system-ui, -apple-system, sans-serif`) · `--time-axis-font-size`(`11px`) · `--context-label-size`(`13px`).
+
+**색** — 영역별 접두로 묶여 있다. 바탕 · 테두리부터 바꾸면 대부분이 따라온다.
+
+| 접두 | 영역 | 대표 |
+|---|---|---|
+| `--timeline-*` | 바깥 틀 · 캔버스 | `--timeline-bg` · `--timeline-border` · `--timeline-canvas-bg` |
+| `--time-axis-*` | 시간축 | `--time-axis-bg` · `--time-axis-text` · `--time-axis-now` · `--time-axis-today-bg` |
+| `--dimension-selector-*` · `--dimension-value-*` | 왼쪽 선택기와 그 값 목록 | `--dimension-selector-header-bg` · `--dimension-value-selected-text` |
+| `--context-*` | 맥락 조각 · 라벨 띠 | `--context-header-bg` · `--context-border` · `--context-label-color` |
+| `--dropdown-*` | 선택기 드롭다운 | `--dropdown-menu-bg` · `--dropdown-item-selected-bg` |
+| `--zoom-button-*` · `--scale-indicator-*` | 줌 단추 · 척도 표시 | `--zoom-button-bg` · `--scale-indicator-bg` |
+| `--scrollbar-*` · `--selection-indicator-color` · `--corner-header-bg` | 스크롤 막대 · 선택 표시 · 왼쪽 위 칸 | |
+
+`@iyulab/components` 토큰이 있으면 모션 지속시간(`--u-duration-*`)과 떠 있는 층(`--u-layer-floating`)을 거기서 읽는다.
+
 ## 데이터 모델 예시
 
 ```ts

@@ -23,6 +23,8 @@
 
 ### Changed
 
+- README: a section on the CSS custom properties — the size handles with their defaults, the colour handles by area.
+
 - **The built-in text defaults to English** (`DEFAULT_TIMELINE_LABELS`). The Korean text ships with the package and
   is chosen with `locale="ko"`; with `locale` empty, the component follows the nearest `lang` (including the
   document's), so a page with `<html lang="ko">` keeps the Korean text. To keep Korean on a page without `lang`, set
