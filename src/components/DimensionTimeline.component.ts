@@ -161,6 +161,8 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   // =========================================================================
 
   @query('d-timeline-canvas') private canvasEl!: TimelineCanvas<T>;
+  /** 작업이 그려지는 영역 — 뷰포트 크기와 포인터 좌표의 기준(축 높이 · 선택기 폭 · 맥락 라벨 폭을 뺀 자리). */
+  @query('.canvas-area') private canvasArea?: HTMLElement;
 
   private viewportManager: ViewportManager = new ViewportManager();
   private layoutEngine: CollisionLayoutEngine = new CollisionLayoutEngine();
@@ -264,11 +266,12 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     // 초기 크기 설정
     this.updateViewportSize();
 
-    // ResizeObserver 설정
+    // ResizeObserver 설정 — 캔버스 영역을 잰다. 호스트 크기가 그대로여도 축 높이 · 선택기 폭
+    // (`--time-axis-height` · `--dimension-selector-width`)이 바뀌면 캔버스 영역이 바뀐다.
     this.resizeObserver = new ResizeObserver(() => {
       this.updateViewportSize();
     });
-    this.resizeObserver.observe(this);
+    this.resizeObserver.observe(this.canvasArea ?? this);
 
     // 크기 설정 후 레이아웃 재계산
     if (this.tasks.length > 0) {
@@ -280,9 +283,9 @@ export class DimensionTimeline<T = unknown> extends LitElement {
    * 뷰포트 크기 업데이트
    */
   private updateViewportSize(): void {
-    const rect = this.getBoundingClientRect();
-    const width = rect.width - 200; // dimension selector 제외
-    const height = rect.height - 48; // time axis 제외
+    const rect = this.canvasArea?.getBoundingClientRect();
+    if (!rect) return;
+    const { width, height } = rect;
 
     if (width > 0 && height > 0) {
       this.viewportManager.setSize(width, height);
@@ -791,12 +794,13 @@ export class DimensionTimeline<T = unknown> extends LitElement {
 
   private handleWheel = (e: WheelEvent): void => {
     e.preventDefault();
-    const rect = this.getBoundingClientRect();
 
     if (this.zoomable && e.ctrlKey) {
-      // Ctrl+휠: 가로+세로 줌
-      const x = e.clientX - rect.left - 200; // dimension selector 너비 제외
-      const y = e.clientY - rect.top - 48; // time axis 높이 제외
+      // Ctrl+휠: 가로+세로 줌 — 캔버스 기준 좌표(드래그 · 히트 테스트와 같은 원점)
+      const rect = this.canvasArea?.getBoundingClientRect();
+      if (!rect) return;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
       this.viewportManager.handleWheelZoom(e.deltaY, x, y);
       this.scale = this.viewportManager.scaleUnit;
       this.recalculateLayout();
@@ -855,9 +859,10 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   private updateDrag(clientX: number, clientY: number): void {
     if (!this.dragState) return;
 
-    const rect = this.getBoundingClientRect();
-    const x = clientX - rect.left - 200;
-    const _y = clientY - rect.top - 48;
+    const rect = this.canvasArea?.getBoundingClientRect();
+    if (!rect) return;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     const deltaX = x - this.dragState.startX;
     const deltaMs = (deltaX / this.viewportManager.timeScale.pixelsPerUnit) *
@@ -894,7 +899,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       const dragWidth = dragEndX - dragStartX;
 
       const cached = this.canvasEl.getTaskById(this.dragState.task.id);
-      const dragY = cached ? cached.absoluteY - this.viewportManager.scrollY : _y;
+      const dragY = cached ? cached.absoluteY - this.viewportManager.scrollY : y;
 
       this.canvasEl.setDragging(this.dragState.task.id, {
         x: dragStartX,
@@ -908,7 +913,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       task: this.dragState.task,
       mode: this.dragState.mode,
       x,
-      y: _y,
+      y,
       snappedStart: this.dragState.snappedStart,
       snappedEnd: this.dragState.snappedEnd,
       currentDimensionValue: this.dragState.currentDimensionValue,

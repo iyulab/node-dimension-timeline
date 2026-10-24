@@ -7,6 +7,10 @@
 - **The timeline and its context slices keep their borders and backgrounds under a document-wide CSS reset**
   (Tailwind's preflight and the like). `d-dimension-timeline` draws its box on its own container and `d-context-slice`
   on a new `base` part, inside the shadow root where a document rule cannot reach them.
+- **The viewport and pointer positions follow the drawn area.** The timeline took its viewport as the host box less a
+  fixed 200px selector and 48px time axis, so with `--dimension-selector-width` or `--time-axis-height` changed — or
+  just the container's border — the visible range, Ctrl+wheel zoom centre and drag positions were off by the
+  difference. Both now come from the task area itself, which is also watched for size changes.
 
 ### Changed
 
