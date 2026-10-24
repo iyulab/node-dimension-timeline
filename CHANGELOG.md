@@ -11,6 +11,15 @@
   fixed 200px selector and 48px time axis, so with `--dimension-selector-width` or `--time-axis-height` changed — or
   just the container's border — the visible range, Ctrl+wheel zoom centre and drag positions were off by the
   difference. Both now come from the task area itself, which is also watched for size changes.
+- **The time axis fills its row.** It was drawn 48px tall whatever `--time-axis-height` said; it now takes the row's
+  height. `d-context-slice`'s `getTotalHeight()` counts its drawn header (`--context-header-height` and its border)
+  instead of a fixed 32px.
+
+### Removed
+
+- `TimelineOptions` and `DEFAULT_OPTIONS` — exported but read by nothing; setting them changed nothing. The element's
+  properties and the CSS custom properties are the configuration.
+- `d-time-axis`'s `height` property — give the element a height in CSS instead (it fills the box it is placed in).
 
 ### Changed
 

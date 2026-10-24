@@ -227,61 +227,6 @@ export interface ContextLayout {
 }
 
 // ============================================================================
-// 옵션 타입
-// ============================================================================
-
-/**
- * Timeline 컴포넌트 옵션
- */
-export interface TimelineOptions {
-  /** 초기 시간 범위 */
-  initialRange?: TimeRange;
-  /** 초기 스케일 단위 */
-  initialScale?: TimeScaleUnit;
-  /** 줌 활성화 */
-  zoomable?: boolean;
-  /** 팬 활성화 */
-  pannable?: boolean;
-  /** Task 드래그 이동 활성화 */
-  tasksDraggable?: boolean;
-  /** Task 리사이즈 활성화 */
-  tasksResizable?: boolean;
-  /** Cross-dimension 이동 활성화 */
-  crossDimensionMove?: boolean;
-  /** Task 높이 (픽셀) */
-  taskHeight?: number;
-  /** Task 간 간격 (픽셀) */
-  taskGap?: number;
-  /** Context 헤더 높이 (픽셀) */
-  contextHeaderHeight?: number;
-  /** 시간축 헤더 높이 (픽셀) */
-  timeAxisHeight?: number;
-  /** Dimension 선택기 너비 (픽셀) */
-  dimensionSelectorWidth?: number;
-}
-
-/**
- * 기본 옵션 값
- */
-export const DEFAULT_OPTIONS: Required<TimelineOptions> = {
-  initialRange: {
-    start: new Date(),
-    end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1주일
-  },
-  initialScale: 'day',
-  zoomable: true,
-  pannable: true,
-  tasksDraggable: true,
-  tasksResizable: true,
-  crossDimensionMove: true,
-  taskHeight: 32,
-  taskGap: 4,
-  contextHeaderHeight: 40,
-  timeAxisHeight: 48,
-  dimensionSelectorWidth: 200,
-};
-
-// ============================================================================
 // 히트 테스트 타입
 // ============================================================================
 

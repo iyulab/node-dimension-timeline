@@ -66,10 +66,6 @@ export class TimeAxis extends LitElement {
   @property({ type: Boolean, attribute: 'highlight-today' })
   highlightToday: boolean = true;
 
-  /** 높이 */
-  @property({ type: Number })
-  height: number = 48;
-
   /** 현재 시간 X 좌표 (외부에서 전달) */
   @property({ type: Number, attribute: 'now-x' })
   nowX: number | null = null;
@@ -101,7 +97,7 @@ export class TimeAxis extends LitElement {
 
   render() {
     return html`
-      <div class="time-axis-container" style="height: ${this.height}px">
+      <div class="time-axis-container">
         <!-- 상단 (Primary) 라벨 -->
         <div class="primary-labels">
           ${this.primaryLabels.map(label => {

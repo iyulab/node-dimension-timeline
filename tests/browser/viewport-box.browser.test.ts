@@ -53,3 +53,28 @@ describe('뷰포트 상자', () => {
     expect(el.viewportManager.height).toBeCloseTo(r.height, 0);
   });
 });
+
+describe('축 · 맥락 머리글의 높이', () => {
+  it('🔴시간축이 --time-axis-height 행을 채운다', async () => {
+    const el = await mount('--time-axis-height: 80px;');
+    const axis = el.shadowRoot!.querySelector('d-time-axis')!;
+    await (axis as unknown as { updateComplete: Promise<unknown> }).updateComplete;
+    const container = axis.shadowRoot!.querySelector('.time-axis-container')!;
+    expect(Math.round(axis.getBoundingClientRect().height)).toBe(80);
+    expect(Math.round(container.getBoundingClientRect().height)).toBe(79); // 아래 경계선 1px
+  });
+
+  it('🔴맥락 조각의 전체 높이가 그려진 머리글(--context-header-height)을 쓴다', async () => {
+    const slice = document.createElement('d-context-slice') as unknown as HTMLElement & {
+      updateComplete: Promise<unknown>;
+      getTotalHeight(): number;
+      getContentHeight(): number;
+    };
+    slice.style.setProperty('--context-header-height', '48px');
+    document.body.appendChild(slice);
+    await slice.updateComplete;
+    await frame();
+    // 머리글 상자 = --context-header-height 48 + 아래 경계선 1
+    expect(slice.getTotalHeight() - slice.getContentHeight()).toBe(49);
+  });
+});

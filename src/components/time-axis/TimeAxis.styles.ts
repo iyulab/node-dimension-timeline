@@ -2,8 +2,11 @@ import { css } from 'lit';
 
 export const styles = css`
   /* reset-ok: d-time-axis 는 d-dimension-timeline 의 섀도 안에서만 그려진다 — 문서의 전역 리셋이 닿지 않는다. */
+  /* 높이는 놓인 자리가 정한다 — 타임라인 안에서는 --time-axis-height 행을 채운다. */
   :host {
     display: block;
+    height: 100%;
+    box-sizing: border-box;
     position: relative;
     background: var(--time-axis-bg, #f8fafc);
     border-bottom: 1px solid var(--time-axis-border, #e2e8f0);

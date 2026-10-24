@@ -181,7 +181,9 @@ export class ContextSlice extends LitElement {
 
   /** 전체 높이 가져오기 (헤더 포함) */
   getTotalHeight(): number {
-    const headerHeight = this.showHeader ? 32 : 0; // CSS variable default
+    // 그려진 머리글의 높이(`--context-header-height`) — 그리기 전이면 그 기본값 32
+    const header = this.renderRoot.querySelector<HTMLElement>(".context-header");
+    const headerHeight = this.showHeader ? (header?.offsetHeight || 32) : 0;
     return headerHeight + this.getContentHeight();
   }
 }
