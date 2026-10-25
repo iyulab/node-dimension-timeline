@@ -38,6 +38,8 @@
     }
   },
   "sideEffects": [
+    "./dist/index.js",
+    "./src/index.ts",
     "./dist/components/**/*.js",
     "./src/components/**/*.ts"
   ],

@@ -48,7 +48,9 @@
   with identical intervals it could remove a different one than the predicate named.
 - `CollisionLayoutEngine.layout()` with no tasks reports a `totalHeight` of 0 instead of minus one gap.
 - The published package now declares `sideEffects`, so bundlers keep the modules that register the custom elements
-  and can tree-shake the rest. It also declares `engines.node` and ships this changelog.
+  and can tree-shake the rest. The package entry is among them: it imports the registrations for their effect only, and
+  a bundler drops such an import inside a module it treats as free of side effects — without the entry declared, an
+  app that imported only types and `ArrayDataSource` from the package shipped no `<d-dimension-timeline>` at all. It also declares `engines.node` and ships this changelog.
 - Comments inside the component stylesheets are no longer shipped in `dist`.
 
 ## [0.2.0] - 2026-10-19
