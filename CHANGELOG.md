@@ -1,25 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] - 2026-10-27
 
-### Fixed
+### Added
 
-- **The timeline and its context slices keep their borders and backgrounds under a document-wide CSS reset**
-  (Tailwind's preflight and the like). `d-dimension-timeline` draws its box on its own container and `d-context-slice`
-  on a new `base` part, inside the shadow root where a document rule cannot reach them.
-- **The viewport and pointer positions follow the drawn area.** The timeline took its viewport as the host box less a
-  fixed 200px selector and 48px time axis, so with `--dimension-selector-width` or `--time-axis-height` changed — or
-  just the container's border — the visible range, Ctrl+wheel zoom centre and drag positions were off by the
-  difference. Both now come from the task area itself, which is also watched for size changes.
-- **The time axis fills its row.** It was drawn 48px tall whatever `--time-axis-height` said; it now takes the row's
-  height. `d-context-slice`'s `getTotalHeight()` counts its drawn header (`--context-header-height` and its border)
-  instead of a fixed 32px.
-
-### Removed
-
-- `TimelineOptions` and `DEFAULT_OPTIONS` — exported but read by nothing; setting them changed nothing. The element's
-  properties and the CSS custom properties are the configuration.
-- `d-time-axis`'s `height` property — give the element a height in CSS instead (it fills the box it is placed in).
+- `locale` — the language of the built-in text. `registerTimelineLabels(locale, labels)` adds a language;
+  `resolveLabels(labels, locale)` takes the locale as its second argument.
+- Typed `addEventListener` / `removeEventListener` overloads for the `timeline-*` events (`TimelineEventMap`).
 
 ### Changed
 
@@ -36,13 +23,24 @@
   `@iyulab/components` (>=1.49.0, the release that added `--u-layer-*`) is an optional peer — nothing changes
   without it.
 
-### Added
+### Removed
 
-- `locale` — the language of the built-in text. `registerTimelineLabels(locale, labels)` adds a language;
-  `resolveLabels(labels, locale)` takes the locale as its second argument.
-- Typed `addEventListener` / `removeEventListener` overloads for the `timeline-*` events (`TimelineEventMap`).
+- `TimelineOptions` and `DEFAULT_OPTIONS` — exported but read by nothing; setting them changed nothing. The element's
+  properties and the CSS custom properties are the configuration.
+- `d-time-axis`'s `height` property — give the element a height in CSS instead (it fills the box it is placed in).
 
 ### Fixed
+
+- **The timeline and its context slices keep their borders and backgrounds under a document-wide CSS reset**
+  (Tailwind's preflight and the like). `d-dimension-timeline` draws its box on its own container and `d-context-slice`
+  on a new `base` part, inside the shadow root where a document rule cannot reach them.
+- **The viewport and pointer positions follow the drawn area.** The timeline took its viewport as the host box less a
+  fixed 200px selector and 48px time axis, so with `--dimension-selector-width` or `--time-axis-height` changed — or
+  just the container's border — the visible range, Ctrl+wheel zoom centre and drag positions were off by the
+  difference. Both now come from the task area itself, which is also watched for size changes.
+- **The time axis fills its row.** It was drawn 48px tall whatever `--time-axis-height` said; it now takes the row's
+  height. `d-context-slice`'s `getTotalHeight()` counts its drawn header (`--context-header-height` and its border)
+  instead of a fixed 32px.
 
 - `IntervalTree.delete()` could miss an interval whose start equals another's once the tree had rebalanced, and
   with identical intervals it could remove a different one than the predicate named.
