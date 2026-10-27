@@ -49,6 +49,11 @@ jobs:
       - run: npm run build
         if: steps.check.outputs.exists == 'false'
 
+      # The test suite has a browser project (vitest + Playwright) — the runner has no Chromium of its own.
+      - name: Install Chromium
+        if: steps.check.outputs.exists == 'false'
+        run: npx playwright install --with-deps chromium
+
       - run: npm test --if-present
         if: steps.check.outputs.exists == 'false'
 
