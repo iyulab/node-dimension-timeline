@@ -1,6 +1,9 @@
 # Changelog
 
-## [0.3.0] - 2026-10-27
+## [0.3.1] - 2026-10-27
+
+The first release of these changes — the `v0.3.0` tag was made, but its publish job stopped before publishing
+(the release workflow ran the browser tests without installing a browser), so 0.3.0 was never on the registry.
 
 ### Added
 
