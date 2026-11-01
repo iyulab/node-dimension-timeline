@@ -51,9 +51,8 @@ export const styles = css`
     font-size: var(--context-label-size, 13px);
     font-weight: 500;
     color: var(--context-label-color, #334155);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .context-badge {

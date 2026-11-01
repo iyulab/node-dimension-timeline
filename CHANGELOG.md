@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- **Dimension value names and context labels wrap instead of ending in «…».** In the 200px dimension selector a long
+  value name lost its tail with no way to read it.
+
 ## [0.3.1] - 2026-10-27
 
 The first release of these changes — the `v0.3.0` tag was made, but its publish job stopped before publishing

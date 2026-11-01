@@ -171,9 +171,8 @@ export const styles = css`
 
   .dimension-value-item .value-label {
     flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .dimension-value-item .value-count {
