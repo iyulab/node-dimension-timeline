@@ -45,7 +45,7 @@ export const styles = css`
     color: var(--time-axis-text, #64748b);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* ellipsis-ok: zooming in widens the time cells and shows the full label */
     border-right: 1px solid var(--time-axis-divider, #e2e8f0);
     padding: 0 4px;
     box-sizing: border-box;
