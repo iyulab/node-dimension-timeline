@@ -29,7 +29,7 @@ export const styles = css`
     grid-column: 1;
     grid-row: 1;
     background: var(--corner-header-bg, #f1f5f9);
-    border-right: 1px solid var(--timeline-border, #e2e8f0);
+    border-inline-end: 1px solid var(--timeline-border, #e2e8f0);
     border-bottom: 1px solid var(--timeline-border, #e2e8f0);
     display: flex;
     align-items: center;
@@ -78,7 +78,7 @@ export const styles = css`
 
   .dropdown-icon {
     position: absolute;
-    right: 8px;
+    inset-inline-end: 8px;
     top: 50%;
     transform: translateY(-50%);
     width: 12px;
@@ -89,8 +89,7 @@ export const styles = css`
   .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     margin-top: 4px;
     padding: 4px 0;
     background: var(--dropdown-menu-bg, #ffffff);
@@ -162,6 +161,7 @@ export const styles = css`
     overflow: hidden;
   }
 
+  /* physical-ok: the plot region keeps time running left to right in any page direction — the time axis is not mirrored */
   /* Context 영역 (좌측) */
   .context-labels {
     position: absolute;
@@ -175,6 +175,7 @@ export const styles = css`
     z-index: 5;
   }
 
+  /* physical-ok: the plot region keeps time running left to right in any page direction — the time axis is not mirrored */
   /* Canvas 영역 */
   .canvas-area {
     position: absolute;
@@ -185,6 +186,7 @@ export const styles = css`
     overflow: hidden;
   }
 
+  /* physical-ok: the plot region keeps time running left to right in any page direction — the time axis is not mirrored */
   /* 스크롤바 */
   .scrollbar-vertical {
     position: absolute;
@@ -197,8 +199,7 @@ export const styles = css`
 
   .scrollbar-thumb {
     position: absolute;
-    left: 1px;
-    right: 1px;
+    inset-inline: 1px;
     background: var(--scrollbar-thumb, #cbd5e1);
     border-radius: 4px;
     cursor: pointer;
@@ -209,6 +210,7 @@ export const styles = css`
     background: var(--scrollbar-thumb-hover, #94a3b8);
   }
 
+  /* physical-ok: the plot region keeps time running left to right in any page direction — the time axis is not mirrored */
   /* 줌 컨트롤 */
   .zoom-controls {
     position: absolute;
@@ -252,6 +254,7 @@ export const styles = css`
   }
 
   /* 스케일 인디케이터 */
+  /* physical-ok: centred with translateX(-50%) over the plot — symmetric, a logical inset would shift it by half its width in RTL */
   .scale-indicator {
     position: absolute;
     top: 8px;

@@ -36,6 +36,7 @@ export const styles = css`
     position: relative;
   }
 
+  /* physical-ok: tick separators on the time axis, which runs left to right in any page direction */
   .time-label {
     position: absolute;
     display: flex;
@@ -60,6 +61,7 @@ export const styles = css`
     font-weight: 500;
   }
 
+  /* physical-ok: tick separators on the time axis, which runs left to right in any page direction */
   .time-label.minor {
     font-size: 10px;
     color: var(--time-axis-text-minor, #94a3b8);
@@ -77,6 +79,7 @@ export const styles = css`
     z-index: 10;
   }
 
+  /* physical-ok: centred on the now line with translateX(-50%) — symmetric */
   .now-indicator::before {
     content: '';
     position: absolute;

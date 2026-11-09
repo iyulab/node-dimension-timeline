@@ -10,6 +10,7 @@ export const styles = css`
     background: var(--timeline-canvas-bg, #ffffff);
   }
 
+  /* physical-ok: the canvas is anchored at the plot origin; time runs left to right in any page direction */
   canvas {
     display: block;
     position: absolute;
@@ -37,8 +38,7 @@ export const styles = css`
   .loading-overlay {
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     bottom: 0;
     background: rgba(255, 255, 255, 0.7);
     display: flex;

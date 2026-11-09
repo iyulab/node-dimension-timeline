@@ -4,6 +4,12 @@
 
 ### Fixed
 
+- **In a right-to-left page the chrome follows the reading direction and the time axis stays left to right.** The dimension
+  selector column and the corner header stand at the start side (the right), the corner header's border faces the time axis,
+  the selector's dropdown, its chevron and the selected-value mark sit on the logical start/end sides. Time runs from left to
+  right in any page direction — the axis, the canvas, the ticks, the now marker, the scrollbar and the zoom buttons are one
+  plot region that keeps physical coordinates, so the arrow keys still pan toward earlier (left) or later (right) time.
+  Left-to-right rendering is unchanged.
 - **Dimension value names and context labels wrap instead of ending in «…».** In the 200px dimension selector a long
   value name lost its tail with no way to read it.
 

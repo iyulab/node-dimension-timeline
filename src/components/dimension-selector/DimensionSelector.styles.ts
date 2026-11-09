@@ -62,8 +62,7 @@ export const styles = css`
   .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     margin-top: 4px;
     padding: 4px 0;
     background: var(--dimension-selector-menu-bg, #ffffff);
@@ -228,7 +227,7 @@ export const styles = css`
   .selection-indicator {
     position: absolute;
     top: 0;
-    right: 0;
+    inset-inline-end: 0;
     width: 3px;
     height: 100%;
     background: var(--selection-indicator-color, #ef4444);
