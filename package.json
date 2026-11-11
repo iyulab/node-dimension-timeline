@@ -1,7 +1,7 @@
 {
   "name": "@iyulab/dimension-timeline",
   "description": "A timeline component for visualizing tasks across customizable dimensions with collision-aware layout",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "keywords": [
     "iyulab",
     "timeline",
@@ -67,7 +67,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@iyulab/components": "^2.31.0",
+    "@iyulab/components": "^3.0.0",
     "@types/node": "^26.1.1",
     "@vitest/browser-playwright": "^5.0.0",
     "eslint": "^10.1.0",
