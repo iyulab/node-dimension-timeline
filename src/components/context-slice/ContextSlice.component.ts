@@ -9,7 +9,10 @@ import { property, state } from 'lit/decorators.js';
 import { styles } from './ContextSlice.styles.js';
 
 /**
- * ContextSlice 컴포넌트
+ * 타임라인을 차원 값 하나로 자른 조각 — 머리글(작업 수 · 행 수)과 그 값의 행들을 담는다. 머리글로 접고 펼 수 있고(`context-toggle`),
+ * 작업을 끌어다 놓는 자리다(`context-drop`).
+ *
+ * @customElement d-context-slice
  */
 export class ContextSlice extends LitElement {
   static styles: CSSResultGroup = styles;

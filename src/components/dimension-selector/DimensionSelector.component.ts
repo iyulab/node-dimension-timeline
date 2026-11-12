@@ -18,7 +18,10 @@ export interface DimensionValueWithCount extends DimensionValue {
 }
 
 /**
- * DimensionSelector 컴포넌트
+ * 차원 값의 목록 — 활성 차원(`active-dimension`)의 값을 보여 주고, 검색(`show-search`) · 차원 드롭다운(`show-dimension-dropdown`) ·
+ * 값 필터(`filterable`)로 고른다. 차원이 바뀌거나(`dimension-change`) 값을 거르거나 누르면(`dimension-filter` · `dimension-value-click`) 알린다.
+ *
+ * @customElement d-dimension-selector
  */
 export class DimensionSelector extends LitElement {
   static styles: CSSResultGroup = styles;

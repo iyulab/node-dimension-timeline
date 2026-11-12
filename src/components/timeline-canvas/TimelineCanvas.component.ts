@@ -14,7 +14,10 @@ import { TaskRenderer } from '../../core/TaskRenderer.js';
 import { HitTestManager } from '../../core/HitTestManager.js';
 
 /**
- * TimelineCanvas 컴포넌트
+ * 작업 막대를 `<canvas>` 에 그리는 본체 — 격자선(`show-grid-lines`) · 현재 시각 표시(`show-now-marker`) · 번갈아 칠한 행
+ * (`use-alternating-row-colors`)을 그리고, 선택한 작업(`selected-task-id`)과 포인터 아래의 작업을 알린다(`timeline-task-*`).
+ *
+ * @customElement d-timeline-canvas
  */
 export class TimelineCanvas<T = unknown> extends LitElement {
   static styles: CSSResultGroup = styles;

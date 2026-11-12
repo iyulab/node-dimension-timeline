@@ -27,6 +27,7 @@
   ],
   "type": "module",
   "types": "./dist/index.d.ts",
+  "customElements": "./dist/custom-elements.json",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -49,7 +50,8 @@
   "scripts": {
     "preversion": "node -e \"if(require('fs').existsSync('../../scripts/preversion-check.mjs'))require('child_process').execFileSync('node',['../../scripts/preversion-check.mjs'],{stdio:'inherit'})\"",
     "start": "vite --force",
-    "build": "npm run typecheck && eslint && vite build",
+    "analyze": "cem analyze",
+    "build": "npm run typecheck && eslint && vite build && npm run analyze",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint src/ tests/"
@@ -66,6 +68,7 @@
     }
   },
   "devDependencies": {
+    "@custom-elements-manifest/analyzer": "^0.11.0",
     "@eslint/js": "^10.0.1",
     "@iyulab/components": "^3.0.0",
     "@types/node": "^26.1.1",

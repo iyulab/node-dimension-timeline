@@ -23,7 +23,9 @@ interface TimeLabel {
 }
 
 /**
- * TimeAxis 컴포넌트
+ * 시간축 — 스케일 단위(`scale`)에 맞춘 주 · 보조 눈금 문구를 그리고, 오늘(`highlight-today`)과 현재 시각(`show-now`)을 표시한다.
+ *
+ * @customElement d-time-axis
  */
 export class TimeAxis extends LitElement {
   static styles: CSSResultGroup = styles;

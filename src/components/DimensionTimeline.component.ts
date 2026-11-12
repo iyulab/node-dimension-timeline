@@ -25,7 +25,10 @@ import { snapToUnit } from '../utilities/DateUtils.js';
 import { resolveLabels } from '../utilities/Labels.js';
 
 /**
- * DimensionTimeline 컴포넌트
+ * 작업을 고정된 행이 아닌 **관심 차원(Dimension)** 기준으로 시간축에 배치하는 타임라인 — 작업이 겹칠 때만 시각적으로 개행되며
+ * 행 자체는 의미를 가지지 않는다. 시간축 · 차원 선택기 · 차원 값별 조각 · 캔버스를 한 요소로 묶는다.
+ *
+ * @customElement d-dimension-timeline
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging -- typed event listeners (the interface below): the merged overloads are implemented by EventTarget
 export class DimensionTimeline<T = unknown> extends LitElement {

@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- **`custom-elements.json` — a Custom Elements Manifest for every element.** The package ships `dist/custom-elements.json`
+  (`@iyulab/dimension-timeline/dist/custom-elements.json`, declared in the `customElements` field of `package.json`) so editors,
+  documentation tools and AI agents can read each element's attributes, properties, events and CSS parts without
+  parsing the source. It is generated at build time (`npm run analyze`) and lists the events an element raises through
+  `emit()` with a literal name. The five elements' class descriptions replace the placeholders and carry the tag name
+  (`@customElement d-…`), which the analyzer needs because these elements are registered through `static define(name)`.
+
 ### Fixed
 
 - **The row groups are ordered by the element's locale, with numbers inside a name read as numbers.** The dimension values that name the rows were ordered with the browser's default string comparison: `Team 10` stood before `Team 2`, and whether Hangul names came before or after Latin ones followed each user's browser language, so the same timeline showed its rows in a different order to two users. The rows now follow the `locale` attribute (or the nearest `lang`), then English, never the browser language: `Team 2` before `Team 10`, case and accents compare as the same letter. Rows that start with an unassigned value still come last.
