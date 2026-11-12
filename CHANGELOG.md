@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- **The row groups are ordered by the element's locale, with numbers inside a name read as numbers.** The dimension values that name the rows were ordered with the browser's default string comparison: `Team 10` stood before `Team 2`, and whether Hangul names came before or after Latin ones followed each user's browser language, so the same timeline showed its rows in a different order to two users. The rows now follow the `locale` attribute (or the nearest `lang`), then English, never the browser language: `Team 2` before `Team 10`, case and accents compare as the same letter. Rows that start with an unassigned value still come last.
+
 ## [0.3.2] - 2026-11-11
 
 ### Fixed

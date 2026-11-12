@@ -316,7 +316,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     }
 
     // 레이아웃 옵션 변경
-    if (changedProperties.has('taskHeight') || changedProperties.has('taskGap')) {
+    if (changedProperties.has('taskHeight') || changedProperties.has('taskGap') || changedProperties.has('locale')) {
       this.layoutEngine.setOptions({
         taskHeight: this.taskHeight,
         taskGap: this.taskGap,
@@ -553,6 +553,7 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       this.viewportManager.timeScale,
       undefined, // visibleRange
       this.viewportManager.zoomY, // Y축 줌 레벨
+      this.locale || this.closest('[lang]')?.getAttribute('lang') || undefined, // 행 묶음의 글자 순서
     );
 
     // Context 위치 계산 및 색상 정보

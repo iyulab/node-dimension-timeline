@@ -55,6 +55,29 @@ const DEFAULT_LAYOUT_OPTIONS: LayoutOptions = {
 };
 
 /**
+ * 차원 값(행 묶음 이름)의 글자 순서 — 숫자 구간은 수로(`팀2` < `팀10`), 대소문자 · 악센트는 같은 글자, 로캘은 호출자가
+ * 정한 것(요소의 `locale` · `lang`)이며 브라우저 언어가 아니다 — 같은 화면의 행 순서가 사용자마다 다르지 않게 한다.
+ * components 의 `compareText` 와 같은 규칙이지만 그 모듈을 import 하지 않는다: components 는 이 패키지의 선택적 peer 라
+ * JS 를 싣지 않는다.
+ * compare-ok: 이 패키지 자신의 로캘로 만든 collator — components 는 선택적 peer 라 JS import 가 불가능하다
+ */
+const collators = new Map<string, Intl.Collator>();
+function textCollator(locale?: string): Intl.Collator {
+  const tag = locale || 'en';
+  let collator = collators.get(tag);
+  if (!collator) {
+    const options: Intl.CollatorOptions = { numeric: true, sensitivity: 'base' };
+    try {
+      collator = new Intl.Collator(tag, options); // compare-ok: 자기 로캘의 collator — components 는 선택적 peer 라 JS 를 import 할 수 없다
+    } catch {
+      collator = new Intl.Collator('en', options); // compare-ok: 같은 collator 의 영어 폴백
+    }
+    collators.set(tag, collator);
+  }
+  return collator;
+}
+
+/**
  * CollisionLayoutEngine 클래스
  * Task들의 시간 겹침을 감지하고 자동으로 행을 할당합니다.
  */
@@ -68,6 +91,7 @@ export class CollisionLayoutEngine {
   /**
    * Task 목록을 레이아웃
    * @param zoomY Y축 줌 레벨 (기본 1.0)
+   * @param locale 행 묶음(차원 값)의 글자 순서를 정하는 로캘 — 없으면 영어. 브라우저 언어가 아니다
    */
   layout<T = unknown>(
     tasks: Task<T>[],
@@ -75,6 +99,7 @@ export class CollisionLayoutEngine {
     timeScale: TimeScale,
     visibleRange?: TimeRange,
     zoomY: number = 1.0,
+    locale?: string,
   ): LayoutResult<T> {
     const startTime = performance.now();
 
@@ -83,7 +108,7 @@ export class CollisionLayoutEngine {
     const scaledTaskGap = this.options.taskGap * zoomY;
 
     // Dimension 값별로 그룹화
-    const grouped = this.groupByDimension(tasks, dimensionKey);
+    const grouped = this.groupByDimension(tasks, dimensionKey, locale);
 
     // 각 그룹별로 레이아웃 계산
     const contexts: ContextLayoutResult<T>[] = [];
@@ -187,7 +212,9 @@ export class CollisionLayoutEngine {
   private groupByDimension<T>(
     tasks: Task<T>[],
     dimensionKey: string,
+    locale?: string,
   ): Map<string, Task<T>[]> {
+    const collator = textCollator(locale);
     const grouped = new Map<string, Task<T>[]>();
 
     for (const task of tasks) {
@@ -209,7 +236,7 @@ export class CollisionLayoutEngine {
       const aS = isSpecial(a[0]) ? 1 : 0;
       const bS = isSpecial(b[0]) ? 1 : 0;
       if (aS !== bS) return aS - bS;
-      return (a[0] ?? '').localeCompare(b[0] ?? '');
+      return collator.compare(a[0] ?? '', b[0] ?? '');
     }));
   }
 

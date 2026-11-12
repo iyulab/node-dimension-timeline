@@ -86,3 +86,25 @@ describe('CollisionLayoutEngine — layout by dimension', () => {
     expect(r.totalHeight).toBe(0);
   });
 });
+
+describe('CollisionLayoutEngine — order of the row groups', () => {
+  const engine = new CollisionLayoutEngine({ minTaskWidth: 0 });
+  const tasks = ['banana', '가나다', 'Team 10', 'Team 2', 'Team 1'].map((team, i) => task(`t${i}`, 0, 10, team));
+  const order = (locale?: string) =>
+    engine.layout(tasks, 'team', scale(), undefined, 1, locale).contexts.map((c) => c.dimensionValue);
+
+  test('a number inside a name reads as a number — Team 2 before Team 10', () => {
+    const out = order('en');
+    expect(out.indexOf('Team 2')).toBeLessThan(out.indexOf('Team 10'));
+    expect(out.indexOf('Team 1')).toBeLessThan(out.indexOf('Team 2'));
+  });
+
+  test('where Hangul sits among Latin names follows the locale given, not the browser language', () => {
+    expect(order('en').at(-1)).toBe('가나다');
+    expect(order('ko')[0]).toBe('가나다');
+  });
+
+  test('NEGATIVE: a malformed locale does not throw and orders as English', () => {
+    expect(order('ko_KR')).toEqual(order('en'));
+  });
+});
