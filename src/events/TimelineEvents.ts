@@ -212,6 +212,22 @@ export interface TimelineContextDropDetail {
   dataTransfer: DataTransfer | null;
 }
 
+/**
+ * Task 삭제 요청 이벤트 상세 — 선택된 Task 위에서 Delete 키를 눌렀다. 요소는 아무것도 지우지 않는다.
+ */
+export interface TimelineTaskDeleteRequestDetail {
+  taskId: string;
+}
+
+/**
+ * 경계 도달 이벤트 상세 — 뷰포트가 불러온 범위의 가장자리에 닿았다(더 불러올 때다).
+ */
+export interface TimelineBoundaryReachedDetail {
+  direction: 'left' | 'right' | 'top' | 'bottom';
+  currentStart: Date;
+  currentEnd: Date;
+}
+
 // ============================================================================
 // 이벤트 타입 맵
 // ============================================================================
@@ -227,6 +243,7 @@ export interface TimelineEventMap {
   'timeline-task-hover': CustomEvent<TimelineTaskHoverDetail>;
   'timeline-task-dblclick': CustomEvent<TimelineTaskDoubleClickDetail>;
   'timeline-task-contextmenu': CustomEvent<TimelineTaskContextMenuDetail>;
+  'timeline-task-delete-request': CustomEvent<TimelineTaskDeleteRequestDetail>;
 
   // Dimension 이벤트
   'timeline-dimension-change': CustomEvent<TimelineDimensionChangeDetail>;
@@ -235,6 +252,7 @@ export interface TimelineEventMap {
 
   // 뷰 이벤트
   'timeline-view-change': CustomEvent<TimelineViewChangeDetail>;
+  'timeline-boundary-reached': CustomEvent<TimelineBoundaryReachedDetail>;
   'timeline-zoom': CustomEvent<TimelineZoomDetail>;
   'timeline-scale-change': CustomEvent<TimelineScaleChangeDetail>;
 

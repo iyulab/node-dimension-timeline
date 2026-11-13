@@ -10,6 +10,9 @@ function listen(el: DimensionTimeline) {
     return detail.newScale;
   });
   el.removeEventListener('timeline-task-select', (e) => e.detail.task);
+  // 요소가 실제로 내는 나머지 공개 이벤트도 맵에 있어야 리스너가 타입을 받는다
+  el.addEventListener('timeline-task-delete-request', (e) => e.detail.taskId.length);
+  el.addEventListener('timeline-boundary-reached', (e) => e.detail.direction + e.detail.currentStart.getTime());
   // 네이티브 이벤트도 그대로 타입이 붙는다
   el.addEventListener('click', (e) => e.clientX);
 }

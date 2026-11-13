@@ -20,6 +20,7 @@
   },
   "files": [
     "dist",
+    "skills",
     "CHANGELOG.md",
     "LICENSE",
     "README.md",

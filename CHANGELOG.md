@@ -10,9 +10,16 @@
   parsing the source. It is generated at build time (`npm run analyze`) and lists the events an element raises through
   `emit()` with a literal name. The five elements' class descriptions replace the placeholders and carry the tag name
   (`@customElement d-…`), which the analyzer needs because these elements are registered through `static define(name)`.
+- **An agent skill (`skills/iyulab-dimension-timeline/SKILL.md`).** The package now ships the same kind of short usage guide as the other
+  element packages: the data model, the properties and methods, the events with their `detail` shapes (including which ones can be
+  cancelled), data sources, wording and locale, and a pointer to the Custom Elements Manifest.
 
 ### Fixed
 
+- **`timeline-task-delete-request` and `timeline-boundary-reached` are typed on the element.** The element has always raised both
+  (the Delete key on a selected task; the viewport reaching the edge of the loaded range), but `TimelineEventMap` did not list them, so
+  `addEventListener('timeline-task-delete-request', e => …)` gave `e` the plain `Event` type and `e.detail` did not compile. They now
+  carry `TimelineTaskDeleteRequestDetail` (`{ taskId }`) and `TimelineBoundaryReachedDetail`. Types only; nothing changes at runtime.
 - **The row groups are ordered by the element's locale, with numbers inside a name read as numbers.** The dimension values that name the rows were ordered with the browser's default string comparison: `Team 10` stood before `Team 2`, and whether Hangul names came before or after Latin ones followed each user's browser language, so the same timeline showed its rows in a different order to two users. The rows now follow the `locale` attribute (or the nearest `lang`), then English, never the browser language: `Team 2` before `Team 10`, case and accents compare as the same letter. Rows that start with an unassigned value still come last.
 
 ## [0.3.2] - 2026-11-11
