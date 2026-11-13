@@ -1,13 +1,13 @@
 import { expect, test } from 'vitest';
 import type { DimensionTimeline } from '../src/components/DimensionTimeline.component.js';
-import type { TimelineZoomDetail } from '../src/events/TimelineEvents.js';
+import type { TimelineTaskMoveDetail } from '../src/events/TimelineEvents.js';
 
 // 타입 시험 — `npm run typecheck` 가 이 파일을 컴파일한다. 리스너가 `Event` 가 아니라
-// `CustomEvent<TimelineZoomDetail>` 를 받아야 `e.detail.newScale` 이 컴파일된다.
+// `CustomEvent<TimelineTaskMoveDetail>` 를 받아야 `e.detail.newStart` 가 컴파일된다.
 function listen(el: DimensionTimeline) {
-  el.addEventListener('timeline-zoom', (e) => {
-    const detail: TimelineZoomDetail = e.detail;
-    return detail.newScale;
+  el.addEventListener('timeline-task-move', (e) => {
+    const detail: TimelineTaskMoveDetail = e.detail;
+    return detail.newStart;
   });
   el.removeEventListener('timeline-task-select', (e) => e.detail.task);
   // 요소가 실제로 내는 나머지 공개 이벤트도 맵에 있어야 리스너가 타입을 받는다

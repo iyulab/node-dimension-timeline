@@ -2,7 +2,7 @@
  * Timeline 커스텀 이벤트 정의
  */
 
-import type { Task, TimeScaleUnit, TimeRange } from '../types/index.js';
+import type { Task } from '../types/index.js';
 
 // ============================================================================
 // Task 이벤트
@@ -60,17 +60,6 @@ export interface TimelineTaskDoubleClickDetail<T = unknown> {
   y: number;
 }
 
-/**
- * Task 컨텍스트 메뉴 이벤트 상세
- */
-export interface TimelineTaskContextMenuDetail<T = unknown> {
-  task: Task<T>;
-  dimensionValue: string;
-  x: number;
-  y: number;
-  originalEvent: MouseEvent;
-}
-
 // ============================================================================
 // Dimension 이벤트
 // ============================================================================
@@ -92,45 +81,9 @@ export interface TimelineDimensionValueClickDetail {
   label: string;
 }
 
-/**
- * Dimension 필터 이벤트 상세
- */
-export interface TimelineDimensionFilterDetail {
-  dimension: string;
-  selectedValues: string[];
-}
-
 // ============================================================================
 // 뷰 이벤트
 // ============================================================================
-
-/**
- * 뷰 변경 이벤트 상세
- */
-export interface TimelineViewChangeDetail {
-  visibleRange: TimeRange;
-  scrollX: number;
-  scrollY: number;
-}
-
-/**
- * 줌 이벤트 상세
- */
-export interface TimelineZoomDetail {
-  previousScale: TimeScaleUnit;
-  newScale: TimeScaleUnit;
-  previousZoom: number;
-  newZoom: number;
-  focusDate: Date | null;
-}
-
-/**
- * 스케일 변경 이벤트 상세
- */
-export interface TimelineScaleChangeDetail {
-  previousScale: TimeScaleUnit;
-  newScale: TimeScaleUnit;
-}
 
 // ============================================================================
 // 드래그 이벤트
@@ -173,16 +126,6 @@ export interface TimelineDragEndDetail<T = unknown> {
 // ============================================================================
 
 /**
- * Canvas 클릭 이벤트 상세
- */
-export interface TimelineCanvasClickDetail {
-  x: number;
-  y: number;
-  date: Date;
-  dimensionValue: string | null;
-}
-
-/**
  * Canvas 더블클릭 이벤트 상세
  */
 export interface TimelineCanvasDoubleClickDetail {
@@ -195,22 +138,6 @@ export interface TimelineCanvasDoubleClickDetail {
 // ============================================================================
 // Context 이벤트
 // ============================================================================
-
-/**
- * Context 토글 이벤트 상세
- */
-export interface TimelineContextToggleDetail {
-  dimensionValue: string;
-  collapsed: boolean;
-}
-
-/**
- * Context 드롭 이벤트 상세
- */
-export interface TimelineContextDropDetail {
-  dimensionValue: string;
-  dataTransfer: DataTransfer | null;
-}
 
 /**
  * Task 삭제 요청 이벤트 상세 — 선택된 Task 위에서 Delete 키를 눌렀다. 요소는 아무것도 지우지 않는다.
@@ -242,19 +169,14 @@ export interface TimelineEventMap {
   'timeline-task-resize': CustomEvent<TimelineTaskResizeDetail>;
   'timeline-task-hover': CustomEvent<TimelineTaskHoverDetail>;
   'timeline-task-dblclick': CustomEvent<TimelineTaskDoubleClickDetail>;
-  'timeline-task-contextmenu': CustomEvent<TimelineTaskContextMenuDetail>;
   'timeline-task-delete-request': CustomEvent<TimelineTaskDeleteRequestDetail>;
 
   // Dimension 이벤트
   'timeline-dimension-change': CustomEvent<TimelineDimensionChangeDetail>;
   'timeline-dimension-value-click': CustomEvent<TimelineDimensionValueClickDetail>;
-  'timeline-dimension-filter': CustomEvent<TimelineDimensionFilterDetail>;
 
   // 뷰 이벤트
-  'timeline-view-change': CustomEvent<TimelineViewChangeDetail>;
   'timeline-boundary-reached': CustomEvent<TimelineBoundaryReachedDetail>;
-  'timeline-zoom': CustomEvent<TimelineZoomDetail>;
-  'timeline-scale-change': CustomEvent<TimelineScaleChangeDetail>;
 
   // 드래그 이벤트
   'timeline-drag-start': CustomEvent<TimelineDragStartDetail>;
@@ -262,12 +184,7 @@ export interface TimelineEventMap {
   'timeline-drag-end': CustomEvent<TimelineDragEndDetail>;
 
   // Canvas 이벤트
-  'timeline-canvas-click': CustomEvent<TimelineCanvasClickDetail>;
   'timeline-canvas-dblclick': CustomEvent<TimelineCanvasDoubleClickDetail>;
-
-  // Context 이벤트
-  'timeline-context-toggle': CustomEvent<TimelineContextToggleDetail>;
-  'timeline-context-drop': CustomEvent<TimelineContextDropDetail>;
 }
 
 // ============================================================================

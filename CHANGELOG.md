@@ -14,6 +14,18 @@
   element packages: the data model, the properties and methods, the events with their `detail` shapes (including which ones can be
   cancelled), data sources, wording and locale, and a pointer to the Custom Elements Manifest.
 
+### Removed
+
+- **`cross-dimension-move` (`crossDimensionMove`) is gone from `<d-dimension-timeline>`.** The element never read it: dragging a task
+  moved it in time only, `timeline-task-move`'s `newDimensionValue` always equalled `originalDimensionValue`, and the data source
+  received `start` and `end` only. Setting the attribute had no effect, so removing it changes no behaviour.
+- **Eight names are gone from `TimelineEventMap`, with their detail types** — `timeline-task-contextmenu`, `timeline-dimension-filter`,
+  `timeline-view-change`, `timeline-zoom`, `timeline-scale-change`, `timeline-canvas-click`, `timeline-context-toggle` and
+  `timeline-context-drop` (`TimelineTaskContextMenuDetail`, `TimelineDimensionFilterDetail`, `TimelineViewChangeDetail`,
+  `TimelineZoomDetail`, `TimelineScaleChangeDetail`, `TimelineCanvasClickDetail`, `TimelineContextToggleDetail`,
+  `TimelineContextDropDetail`). Nothing raised them, so a listener typed through the map waited for an event that never came. A test
+  now fails when the map lists a name no `emit()` call raises. Types only; nothing changes at runtime.
+
 ### Fixed
 
 - **`timeline-task-delete-request` and `timeline-boundary-reached` are typed on the element.** The element has always raised both

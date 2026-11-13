@@ -92,10 +92,6 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   @property({ type: Boolean, attribute: 'tasks-resizable' })
   tasksResizable: boolean = true;
 
-  /** Cross-dimension 이동 가능 */
-  @property({ type: Boolean, attribute: 'cross-dimension-move' })
-  crossDimensionMove: boolean = true;
-
   /** 이동/리사이즈 비활성화 줌 레벨 임계치 (이 값 이하면 선택만 가능) */
   @property({ type: Number, attribute: 'disable-edit-zoom-threshold' })
   disableEditZoomThreshold: number = 0.6;
