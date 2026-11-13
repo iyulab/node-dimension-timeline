@@ -28,6 +28,13 @@
 
 ### Fixed
 
+- **A double-click reaches your listener once.** `timeline-task-dblclick` and `timeline-canvas-dblclick` arrived twice per double-click: the
+  inner canvas raised the event across the shadow boundary and the element raised it again under the same name, so a handler (open an
+  editor, create a task) ran twice, and the second `timeline-canvas-dblclick` had no `date`. Parts now keep their events inside the
+  element, so the page sees only what the element raises. The same boundary stops the parts' unprefixed `dimension-change`,
+  `dimension-value-click`, `dimension-filter`, `context-toggle` and `context-drop` and the canvas's `timeline-canvas-mousemove`,
+  `timeline-canvas-mousedown`, `timeline-task-mousedown` and `timeline-canvas-resize` from reaching the document — none was documented.
+  `timeline-task-hover` still reaches the page.
 - **`timeline-task-delete-request` and `timeline-boundary-reached` are typed on the element.** The element has always raised both
   (the Delete key on a selected task; the viewport reaching the edge of the loaded range), but `TimelineEventMap` did not list them, so
   `addEventListener('timeline-task-delete-request', e => …)` gave `e` the plain `Event` type and `e.detail` did not compile. They now

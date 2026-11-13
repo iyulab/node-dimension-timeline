@@ -35,7 +35,9 @@ export class DimensionSelector extends LitElement {
   protected emit(name: string, value?: unknown, options?: CustomEventInit): boolean {
     const event = new CustomEvent(name, {
       bubbles: true,
-      composed: true,
+      // 부품의 이벤트는 호스트까지만 간다 — 섀도 경계를 넘으면 호스트가 같은 이름으로 다시 내는 것과 겹쳐 소비자가 두 번 받는다.
+      // 소비자에게 닿아야 하는 것은 호출자가 `{ composed: true }` 로 명시한다.
+      composed: false,
       cancelable: options?.cancelable ?? false,
       detail: value,
       ...options,

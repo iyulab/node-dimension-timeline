@@ -101,6 +101,7 @@ Methods: `selectTask(id)`, `scrollToDate(date, position?)`, `scrollToTask(id)`, 
 |---|---|
 | `timeline-task-select` | `{ task, previousTask, dimensionValue }` |
 | `timeline-task-dblclick` | `TimelineTaskDoubleClickDetail` |
+| `timeline-task-hover` | `TimelineTaskHoverDetail` - the pointer entered a task (not listed in the manifest: the inner canvas raises it) |
 | `timeline-task-move` (cancelable) | `{ task, originalStart, originalEnd, newStart, newEnd, originalDimensionValue, newDimensionValue }` |
 | `timeline-task-resize` (cancelable) | `{ task, originalStart, originalEnd, newStart, newEnd, edge: 'start' \| 'end' }` |
 | `timeline-task-delete-request` | `{ taskId }` - the Delete key on a selected task; the element deletes nothing itself |

@@ -31,7 +31,9 @@ export class TimelineCanvas<T = unknown> extends LitElement {
   protected emit(name: string, value?: unknown, options?: CustomEventInit): boolean {
     const event = new CustomEvent(name, {
       bubbles: true,
-      composed: true,
+      // 부품의 이벤트는 호스트까지만 간다 — 섀도 경계를 넘으면 호스트가 같은 이름으로 다시 내는 것과 겹쳐 소비자가 두 번 받는다.
+      // 소비자에게 닿아야 하는 것은 호출자가 `{ composed: true }` 로 명시한다.
+      composed: false,
       cancelable: options?.cancelable ?? false,
       detail: value,
       ...options,
@@ -316,10 +318,11 @@ export class TimelineCanvas<T = unknown> extends LitElement {
 
       // 이벤트 발생
       if (newHoveredId) {
+        // 호스트가 다시 내지 않는 공개 이벤트(`TimelineEventMap`) — 섀도 경계를 넘어 소비자에게 닿아야 한다.
         this.emit('timeline-task-hover', {
           task: hitResult.task,
           dimensionValue: hitResult.dimensionValue,
-        });
+        }, { composed: true });
       }
     }
 
