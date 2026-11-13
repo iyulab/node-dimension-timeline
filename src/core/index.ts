@@ -8,4 +8,3 @@ export * from './CollisionLayoutEngine.js';
 export * from './IncrementalUpdater.js';
 export * from './TaskRenderer.js';
 export * from './HitTestManager.js';
-export * from './InteractionManager.js';

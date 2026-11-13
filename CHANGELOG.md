@@ -16,6 +16,9 @@
 
 ### Removed
 
+- **`InteractionManager`, `InteractionConfig` and `SelectionState` are no longer exported.** The element never used them (its drag and
+  selection handling is its own), and the cross-dimension drag they sketched was never connected. Nothing in this package, its
+  tests or its demo referred to them.
 - **`cross-dimension-move` (`crossDimensionMove`) is gone from `<d-dimension-timeline>`.** The element never read it: dragging a task
   moved it in time only, `timeline-task-move`'s `newDimensionValue` always equalled `originalDimensionValue`, and the data source
   received `start` and `end` only. Setting the attribute had no effect, so removing it changes no behaviour.
