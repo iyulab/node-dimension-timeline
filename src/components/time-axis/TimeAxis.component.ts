@@ -84,10 +84,14 @@ export class TimeAxis extends LitElement {
   // Lifecycle
   // =========================================================================
 
-  protected updated(changedProperties: PropertyValues): void {
-    super.updated(changedProperties);
+  /**
+   * 눈금은 속성에서만 정해지는 값이라 그리기 **전에** 계산한다 — `updated()` 에서 계산하면 낡은 눈금을 한 번 그리고 곧바로 다시
+   * 그린다(스크롤할 때마다 프레임당 두 번 · 한 프레임 늦은 눈금 · Lit 개발 모드 «갱신 뒤 갱신» 경고).
+   */
+  protected willUpdate(changedProperties: PropertyValues): void {
+    super.willUpdate(changedProperties);
 
-    const updateTriggers = ['scale', 'visibleRange', 'pixelsPerUnit', 'scrollX', 'nowX'];
+    const updateTriggers = ['scale', 'visibleRange', 'pixelsPerUnit', 'scrollX', 'nowX', 'highlightToday', 'axisLabel'];
     if (updateTriggers.some(key => changedProperties.has(key))) {
       this.updateLabels();
     }

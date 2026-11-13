@@ -34,6 +34,14 @@ import { resolveLabels } from '../utilities/Labels.js';
 export class DimensionTimeline<T = unknown> extends LitElement {
   static styles: CSSResultGroup = styles;
 
+  // Lit 개발 모드의 «갱신 뒤 갱신» 경고(`change-in-update`)를 이 요소에서 끈다 — 둘째 갱신이 본질이라서다: 캔버스 영역의 크기는 그린 뒤에야
+  // 잴 수 있어(`firstUpdated` → `updateViewportSize`) 격자 · 시간 영역 · 현재 시각이 그 값으로 다시 정해지고, `loading` 표지는 데이터를 부르는
+  // 동안 켜진다. 경고 문구 자신이 «다음 갱신이 이전 갱신의 부수 효과로만 예약될 수 있으면 예외» 라고 적는 경우다. 속성에서 도출되는 값은
+  // 이 요소의 안쪽 부품(`d-time-axis`)처럼 `willUpdate()` 에서 계산한다. (개발 빌드에만 있는 정적 메서드라 옵셔널 호출.)
+  static {
+    this.disableWarning?.('change-in-update');
+  }
+
   static define(name: string) {
     if (!customElements.get(name)) {
       // 종속 컴포넌트 등록

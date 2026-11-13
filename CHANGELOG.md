@@ -43,6 +43,14 @@
   `addEventListener('timeline-task-delete-request', e => …)` gave `e` the plain `Event` type and `e.detail` did not compile. They now
   carry `TimelineTaskDeleteRequestDetail` (`{ taskId }`) and `TimelineBoundaryReachedDetail`. Types only; nothing changes at runtime.
 - **The row groups are ordered by the element's locale, with numbers inside a name read as numbers.** The dimension values that name the rows were ordered with the browser's default string comparison: `Team 10` stood before `Team 2`, and whether Hangul names came before or after Latin ones followed each user's browser language, so the same timeline showed its rows in a different order to two users. The rows now follow the `locale` attribute (or the nearest `lang`), then English, never the browser language: `Team 2` before `Team 10`, case and accents compare as the same letter. Rows that start with an unassigned value still come last.
+- **The time axis computes its labels before it draws, and the elements no longer log Lit's «scheduled an update after an update completed».**
+  `d-time-axis` derived its labels in `updated()`, so every change of the visible range, scroll offset or scale drew stale labels once and
+  then drew again — twice per scroll frame, with the labels one frame late. They are now computed in `willUpdate()`: one draw, current
+  labels. Turning `highlight-today` on after it started off, and changing `axisLabel`, also refresh the labels now (neither did). In a development
+  build of Lit, mounting a timeline logged the warning for `d-time-axis` and `d-dimension-timeline` in the console of every app;
+  the timeline's second draw is inherent (it measures its canvas after the first draw), so that element turns the warning off.
+
+
 
 ## [0.3.2] - 2026-11-11
 
