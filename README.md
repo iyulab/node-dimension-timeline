@@ -64,6 +64,19 @@ timeline.labels = {
 
 ---
 
+### React
+
+`@iyulab/dimension-timeline/react` 가 `DimensionTimelineReact` 를 내보낸다(`@lit/react` 로 감쌌다 — `react` · `@lit/react` 는 이 서브패스를
+쓸 때만 필요한 선택 peer). 객체 · 불리언은 JSX 속성으로 요소의 속성(property)에 들어가고, `TimelineEventMap` 의 이벤트마다 `onTaskSelect`
+같은 `onXxx` 속성이 있어 `detail` 의 형이 묶인다.
+
+```tsx
+import { DimensionTimelineReact } from '@iyulab/dimension-timeline/react';
+
+<DimensionTimelineReact dataSource={dataSource} dimensions={dimensions} activeDimension="worker"
+  onTaskSelect={(e) => setSelected(e.detail.task.id)} />
+```
+
 ## 핵심 개념
 
 * 행(row)은 데이터 의미가 아님

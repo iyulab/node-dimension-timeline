@@ -34,6 +34,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
     "./dist/*": {
       "types": "./dist/*.d.ts",
       "import": "./dist/*"
@@ -61,10 +65,18 @@
     "lit": "^3.3.3"
   },
   "peerDependencies": {
-    "@iyulab/components": ">=1.49.0"
+    "@iyulab/components": ">=1.49.0",
+    "@lit/react": "^1.0.8",
+    "react": "^18.0.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
     "@iyulab/components": {
+      "optional": true
+    },
+    "@lit/react": {
+      "optional": true
+    },
+    "react": {
       "optional": true
     }
   },
@@ -72,11 +84,16 @@
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@eslint/js": "^10.0.1",
     "@iyulab/components": "^3.2.0",
+    "@lit/react": "^1.0.8",
     "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitest/browser-playwright": "^5.1.0",
     "eslint": "^10.15.0",
     "eslint-plugin-lit": "^2.3.1",
     "globals": "^17.14.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.72.2",
     "vite": "^8.3.8",

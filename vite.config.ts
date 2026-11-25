@@ -20,6 +20,7 @@ export default defineConfig({
     lib: {
       entry: [
         resolve(__dirname, 'src/index.ts'),
+        resolve(__dirname, 'src/react.ts'),
       ],
       formats: ['es'],
       fileName: (_format: string, entry: string): string => `${entry}.js`,
@@ -28,6 +29,9 @@ export default defineConfig({
       // 외부 종속성 라이브러리
       external: [
         /^lit.*/,
+        /^@lit\/react/,
+        /^react(\/|$)/,
+        /^react-dom(\/|$)/,
       ],
       output: {
         preserveModules: true,

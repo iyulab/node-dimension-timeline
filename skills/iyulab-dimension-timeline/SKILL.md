@@ -45,6 +45,26 @@ Importing the package registers `<d-dimension-timeline>` (and its inner `d-*` pa
 
 Give the element a height through its container or style. Set `dataSource` and `dimensions` before expecting content.
 
+## React
+
+`@iyulab/dimension-timeline/react` exports `DimensionTimelineReact`, the element wrapped with `@lit/react` (`react` and `@lit/react` are
+optional peers, needed only for this subpath). Object and boolean props go to the element as properties, and every event in
+`TimelineEventMap` is an `onXxx` prop whose `detail` is typed (`onTaskSelect`, `onTaskMove`, `onTaskResize`, `onTaskHover`,
+`onTaskDblclick`, `onTaskDeleteRequest`, `onDimensionChange`, `onDimensionValueClick`, `onBoundaryReached`, `onDragStart`, `onDrag`,
+`onDragEnd`, `onCanvasDblclick`).
+
+```tsx
+import { DimensionTimelineReact } from '@iyulab/dimension-timeline/react';
+
+<DimensionTimelineReact
+  dataSource={dataSource}
+  dimensions={dimensions}
+  activeDimension="worker"
+  tasksDraggable={false}
+  onTaskSelect={(e) => setSelected(e.detail.task.id)}
+/>
+```
+
 ## Data model
 
 ```ts

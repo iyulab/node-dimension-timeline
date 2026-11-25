@@ -17,6 +17,12 @@
 
 ### Added
 
+- **`@iyulab/dimension-timeline/react` — a React entry.** `DimensionTimelineReact` is the element wrapped with `@lit/react`: object and
+  boolean props are passed to the element as properties, and every name in `TimelineEventMap` is an `onXxx` prop whose `detail` is typed
+  (`onTaskSelect`, `onTaskMove`, `onTaskResize`, `onTaskHover`, `onTaskDblclick`, `onTaskDeleteRequest`, `onDimensionChange`,
+  `onDimensionValueClick`, `onBoundaryReached`, `onDragStart`, `onDrag`, `onDragEnd`, `onCanvasDblclick`). A compile-time check fails the
+  build when the event map gains a name this list lacks. `react` and `@lit/react` are optional peer dependencies, needed only for this
+  subpath.
 - **`labels.unassigned` names the lane of tasks that have no value for the active dimension** (English `Unassigned`, Korean `미지정`).
   That lane used to be a row named `(none)` on the canvas with no row on the left; it now has both, and the name follows `locale` and
   `labels` like the other wording. `NO_DIMENSION_VALUE` is the key that lane groups under.
