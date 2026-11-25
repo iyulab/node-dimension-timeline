@@ -151,7 +151,8 @@ export class TimelineCanvas<T = unknown> extends LitElement {
   protected firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
 
-    if (this.canvas) {
+    // 2D 문맥이 없는 환경(DOM 흉내 시험 환경 등)에서는 그리지 않는다 — 요소는 마운트되고 오류는 나지 않는다.
+    if (this.canvas?.getContext('2d')) {
       this.renderer = new TaskRenderer(this.canvas, this.template);
       this.requestRender();
     }

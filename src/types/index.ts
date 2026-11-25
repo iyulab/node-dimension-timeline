@@ -143,6 +143,8 @@ export interface TimelineLabels {
   searchPlaceholder: string;
   /** 값이 없을 때 */
   empty: string;
+  /** 활성 Dimension 에 값이 없는 작업을 모은 줄의 이름 */
+  unassigned: string;
   /** 검색 결과가 없을 때 */
   noResults: string;
   /** 확대 · 축소 단추 이름 */

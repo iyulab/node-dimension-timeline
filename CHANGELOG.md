@@ -1,5 +1,33 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- **The zoom buttons show their icons.** The `+` and `−` were filled paths that are just lines, so they enclosed no area and
+  drew nothing: the buttons looked empty. They are stroked now.
+- **The top row of the time axis keeps its text on screen when a cell is wider than the viewport.** With `scale="hour"` a day cell is
+  2,880px wide; only its left edge was clipped to the viewport, so the centred text sat far off screen. The cell is clipped to the
+  visible range on both sides.
+- **The left list has exactly the lanes the canvas draws.** A value defined in `dimensions[].values` that no task uses used to add a row
+  on the left only, which stacked its label on top of another row. `dimensions[].values` now only names (and colours) the lanes that
+  have tasks; with no tasks at all the defined values still show as the list to pick from.
+- **Mounting the element where `canvas.getContext('2d')` returns `null`** (DOM-emulating test environments) no longer throws
+  `Cannot read properties of null (reading 'clearRect')`. Nothing is drawn there.
+
+### Added
+
+- **`labels.unassigned` names the lane of tasks that have no value for the active dimension** (English `Unassigned`, Korean `미지정`).
+  That lane used to be a row named `(none)` on the canvas with no row on the left; it now has both, and the name follows `locale` and
+  `labels` like the other wording. `NO_DIMENSION_VALUE` is the key that lane groups under.
+
+### Changed
+
+- **Selecting from code no longer raises `timeline-task-select`.** `selectTask(id)` sets the selection quietly and `scrollToTask(id)`
+  only scrolls — it no longer selects. The event is raised when the user selects (pointer press on a task). An app that updates its own
+  state from the event and then calls `selectTask` no longer gets the event back. Code that relied on `scrollToTask` to select calls
+  `selectTask(id)` as well; code that relied on `selectTask` to raise the event handles the state change where it makes it.
+
 ## [0.4.0] - 2026-11-18
 
 ### Added

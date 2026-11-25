@@ -78,6 +78,11 @@ function textCollator(locale?: string): Intl.Collator {
 }
 
 /**
+ * 활성 Dimension 에 값이 없는 작업을 모으는 묶음의 키. 화면 문구는 `labels.unassigned` 다.
+ */
+export const NO_DIMENSION_VALUE = '(none)';
+
+/**
  * CollisionLayoutEngine 클래스
  * Task들의 시간 겹침을 감지하고 자동으로 행을 할당합니다.
  */
@@ -219,7 +224,7 @@ export class CollisionLayoutEngine {
 
     for (const task of tasks) {
       const value = task.dimensions[dimensionKey];
-      const values = value === undefined ? ['(none)']
+      const values = value === undefined ? [NO_DIMENSION_VALUE]
         : Array.isArray(value) ? value : [value];
 
       for (const v of values) {
@@ -230,9 +235,9 @@ export class CollisionLayoutEngine {
       }
     }
 
-    // 값 기준 정렬 (_unassigned_/(none)은 맨 뒤)
+    // 값 기준 정렬 (_unassigned_ · 값 없음 묶음은 맨 뒤)
     return new Map([...grouped.entries()].sort((a, b) => {
-      const isSpecial = (k: string) => !k || k.startsWith('_unassigned') || k === '(none)';
+      const isSpecial = (k: string) => !k || k.startsWith('_unassigned') || k === NO_DIMENSION_VALUE;
       const aS = isSpecial(a[0]) ? 1 : 0;
       const bS = isSpecial(b[0]) ? 1 : 0;
       if (aS !== bS) return aS - bS;

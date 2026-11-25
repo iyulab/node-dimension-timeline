@@ -38,6 +38,12 @@ describe('resolveLabels', () => {
     expect(labels.scales.week).toBe('주');
   });
 
+  test('the lane of tasks without a value is named by the locale and can be overridden', () => {
+    expect(resolveLabels().unassigned).toBe('Unassigned');
+    expect(resolveLabels(undefined, 'ko').unassigned).toBe('미지정');
+    expect(resolveLabels({ unassigned: 'No owner' }, 'ko').unassigned).toBe('No owner');
+  });
+
   test('NEGATIVE: an unregistered locale gets the English defaults', () => {
     expect(resolveLabels(undefined, 'xx').select).toBe('Select');
     expect(resolveLabels(undefined, '').select).toBe('Select');

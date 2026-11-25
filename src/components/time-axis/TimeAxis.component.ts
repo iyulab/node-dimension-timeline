@@ -107,8 +107,11 @@ export class TimeAxis extends LitElement {
         <!-- 상단 (Primary) 라벨 -->
         <div class="primary-labels">
           ${this.primaryLabels.map(label => {
+            // 보이는 범위로 양쪽을 자른다 — 칸이 화면보다 넓어도(`hour` 로 하루를 볼 때) 글자가 보이는 쪽에 선다.
+            // 아직 잰 폭이 없으면(첫 그리기) 오른쪽은 자르지 않는다.
             const clampedLeft = Math.max(0, label.x);
-            const clampedWidth = label.width - (clampedLeft - label.x);
+            const clampedRight = this.clientWidth > 0 ? Math.min(label.x + label.width, this.clientWidth) : label.x + label.width;
+            const clampedWidth = Math.max(0, clampedRight - clampedLeft);
             return html`
               <div
                 class="time-label primary"

@@ -91,7 +91,8 @@ objects, so subscribers are notified.
 | `realtimeInterval` (`realtime-interval`) | `number` | `60000` | Now-marker refresh in ms |
 
 Methods: `selectTask(id)`, `scrollToDate(date, position?)`, `scrollToTask(id)`, `scrollToDimensionValue(value)`,
-`setScale(scale)`, `setActiveDimension(key)`, `refresh()`.
+`setScale(scale)`, `setActiveDimension(key)`, `refresh()`. `selectTask(id)` sets the selection without raising
+`timeline-task-select`, and `scrollToTask(id)` only scrolls — the event is for the user's own selection.
 
 ## Events
 
@@ -99,7 +100,7 @@ Methods: `selectTask(id)`, `scrollToDate(date, position?)`, `scrollToTask(id)`, 
 
 | Event | `detail` |
 |---|---|
-| `timeline-task-select` | `{ task, previousTask, dimensionValue }` |
+| `timeline-task-select` | `{ task, previousTask, dimensionValue }` - the user selected a task (not raised by `selectTask()` / `scrollToTask()`) |
 | `timeline-task-dblclick` | `TimelineTaskDoubleClickDetail` |
 | `timeline-task-hover` | `TimelineTaskHoverDetail` - the pointer entered a task (not listed in the manifest: the inner canvas raises it) |
 | `timeline-task-move` (cancelable) | `{ task, originalStart, originalEnd, newStart, newEnd, originalDimensionValue, newDimensionValue }` |
@@ -119,7 +120,8 @@ replace that (validation, a server round trip), call `event.preventDefault()` on
 
 Built-in wording defaults to English. Set `locale="ko"` for the bundled Korean, or leave `locale` empty to follow the
 nearest ancestor's `lang`. Add a locale with `registerTimelineLabels('ja', { select: '...' })`; override single keys
-for one instance with `timeline.labels = { dimension: 'Group by' }`.
+for one instance with `timeline.labels = { dimension: 'Group by' }`. `labels.unassigned` names the lane of tasks that have no
+value for the active dimension.
 
 ## Styling
 

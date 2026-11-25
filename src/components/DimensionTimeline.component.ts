@@ -14,7 +14,7 @@ import type { DataSource } from '../data/DataSource.js';
 import type { TimelineEventMap } from '../events/TimelineEvents.js';
 import type { LayoutResult } from '../core/CollisionLayoutEngine.js';
 import { ViewportManager, type ViewportChangeEvent } from '../core/ViewportManager.js';
-import { CollisionLayoutEngine } from '../core/CollisionLayoutEngine.js';
+import { CollisionLayoutEngine, NO_DIMENSION_VALUE } from '../core/CollisionLayoutEngine.js';
 import { IncrementalUpdater, LayoutCache } from '../core/IncrementalUpdater.js';
 import { TimelineCanvas } from './timeline-canvas/TimelineCanvas.component.js';
 import { TimeAxis } from './time-axis/TimeAxis.component.js';
@@ -304,6 +304,15 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     }
   }
 
+  protected willUpdate(changedProperties: PropertyValues): void {
+    super.willUpdate(changedProperties);
+
+    // 줄 이름은 문구 · 정의 값에서 나온다 — 바뀌면 그리기 전에 다시 만든다
+    if (this.layoutResult && (changedProperties.has('labels') || changedProperties.has('locale') || changedProperties.has('dimensions'))) {
+      this.dimensionValues = this.calculateDimensionValues();
+    }
+  }
+
   protected updated(changedProperties: PropertyValues): void {
     super.updated(changedProperties);
 
@@ -446,12 +455,12 @@ export class DimensionTimeline<T = unknown> extends LitElement {
           ${this.zoomable ? html`
             <div class="zoom-controls">
               <button class="zoom-button" @click=${this.handleZoomIn} title=${labels.zoomIn} aria-label=${labels.zoomIn}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
                   <path d="M8 3v10M3 8h10"/>
                 </svg>
               </button>
               <button class="zoom-button" @click=${this.handleZoomOut} title=${labels.zoomOut} aria-label=${labels.zoomOut}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
                   <path d="M3 8h10"/>
                 </svg>
               </button>
@@ -489,55 +498,40 @@ export class DimensionTimeline<T = unknown> extends LitElement {
       const result = await this.dataSource.query();
       this.tasks = result.tasks;
 
+      // 레이아웃 계산 — 왼쪽 줄은 이 레이아웃의 맥락에서 나온다
+      this.recalculateLayout();
+
       // Dimension 값별 카운트 계산
       this.dimensionValues = this.calculateDimensionValues();
-
-      // 레이아웃 계산
-      this.recalculateLayout();
     } finally {
       this.loading = false;
     }
   }
 
+  /**
+   * 왼쪽 줄 목록 — **캔버스의 맥락과 같은 줄**이다. 작업이 있으면 레이아웃의 맥락(= 작업이 있는 값)마다 한 줄이고,
+   * `dimensions[].values` 는 그 줄의 이름 · 색을 정하는 이름표일 뿐 작업이 없는 값의 줄을 만들지 않는다.
+   * 값이 없는 작업의 줄은 `labels.unassigned` 로 이름 붙는다. 작업이 하나도 없으면(맥락이 없으면) 정의된 값이
+   * 고를 수 있는 목록으로 남는다.
+   */
   private calculateDimensionValues(): DimensionValueWithCount[] {
-    const countMap = new Map<string, number>();
-
-    for (const task of this.tasks) {
-      const value = task.dimensions[this.activeDimension];
-      if (value !== undefined) {
-        const values = Array.isArray(value) ? value : [value];
-        for (const v of values) {
-          countMap.set(v, (countMap.get(v) ?? 0) + 1);
-        }
-      }
-    }
-
-    // Dimension 정의에서 값 정보 가져오기
     const dimension = this.dimensions.find(d => d.key === this.activeDimension);
     const definedValues = dimension?.values ?? [];
+    const contexts = this.layoutResult?.contexts ?? [];
 
-    const result: DimensionValueWithCount[] = [];
-
-    // 정의된 값 먼저 추가
-    for (const def of definedValues) {
-      result.push({
-        ...def,
-        count: countMap.get(def.key) ?? 0,
-      });
-      countMap.delete(def.key);
+    if (contexts.length === 0) {
+      return definedValues.map(def => ({ ...def, count: 0 }));
     }
 
-    // 나머지 값 추가
-    for (const [key, count] of countMap) {
-      result.push({
-        key,
-        label: key,
-        count,
-      });
-    }
-
-    // 정의된 값 순서를 유지 (dimensions.values 순서 + 나머지)
-    return result;
+    const labels = resolveLabels(this.labels, this.locale || this.closest('[lang]')?.getAttribute('lang') || undefined);
+    return contexts.map(context => {
+      const def = definedValues.find(v => v.key === context.dimensionValue);
+      const key = context.dimensionValue;
+      return {
+        ...(def ?? { key, label: key === NO_DIMENSION_VALUE ? labels.unassigned : key }),
+        count: context.tasks.length,
+      };
+    });
   }
 
   // =========================================================================
@@ -710,8 +704,8 @@ export class DimensionTimeline<T = unknown> extends LitElement {
 
     if (originalEvent.button !== 0) return; // 좌클릭만
 
-    // 선택
-    this.selectTask(task.id);
+    // 선택 — 사용자 상호작용이라 이벤트를 낸다
+    this.selectByUser(task.id);
 
     // 줌 레벨이 임계치 이하면 선택만 가능 (이동/리사이즈 비활성화)
     const currentZoomY = this.viewportManager.zoomY;
@@ -989,8 +983,22 @@ export class DimensionTimeline<T = unknown> extends LitElement {
   // Public API
   // =========================================================================
 
-  /** Task 선택 */
+  /**
+   * 작업을 고른 상태로 둔다. **코드 호출은 조용하다** — `timeline-task-select` 는 사용자가 고를 때만 나간다
+   * (앱이 «선택 → 상태 갱신 → 요소에 선택 반영» 으로 이벤트를 되돌려 받지 않게).
+   */
   selectTask(taskId: string | null): void {
+    this.applySelection(taskId);
+  }
+
+  /** 사용자 상호작용으로 고른다 — 선택을 바꾸고 `timeline-task-select` 를 낸다. */
+  private selectByUser(taskId: string): void {
+    const detail = this.applySelection(taskId);
+    if (detail) this.emit('timeline-task-select', detail);
+  }
+
+  /** 선택 상태를 바꾸고, 고른 작업이 있으면 이벤트 detail 을 돌려준다(내보내기는 부르는 쪽 몫). */
+  private applySelection(taskId: string | null) {
     const previousTask = this.selectedTaskId
       ? this.tasks.find(t => t.id === this.selectedTaskId) ?? null
       : null;
@@ -999,17 +1007,17 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     this.selectedTaskId = taskId;
 
     // 선택된 Task의 dimensionValue 추적 (row 배경 강조용)
-    if (task) {
-      const cached = this.canvasEl?.getTaskById(taskId!);
-      this.selectedDimensionValue = cached?.dimensionValue ?? null;
-      this.emit('timeline-task-select', {
-        task,
-        previousTask,
-        dimensionValue: cached?.dimensionValue ?? '',
-      });
-    } else {
+    if (!task) {
       this.selectedDimensionValue = null;
+      return null;
     }
+    const cached = this.canvasEl?.getTaskById(taskId!);
+    this.selectedDimensionValue = cached?.dimensionValue ?? null;
+    return {
+      task,
+      previousTask,
+      dimensionValue: cached?.dimensionValue ?? '',
+    };
   }
 
   /** 날짜로 스크롤 */
@@ -1018,12 +1026,11 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     this.requestUpdate();
   }
 
-  /** Task로 스크롤 */
+  /** Task로 스크롤 — 보이게 옮길 뿐 선택은 바꾸지 않는다(고르려면 `selectTask`) */
   scrollToTask(taskId: string): void {
     const task = this.tasks.find(t => t.id === taskId);
     if (task) {
       this.scrollToDate(task.start, 'center');
-      this.selectTask(taskId);
     }
   }
 
