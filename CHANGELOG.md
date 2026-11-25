@@ -44,6 +44,7 @@
 
 ### Changed
 
+- **The optional peer `@iyulab/components` now starts at `>=2.0.0`** (was `>=1.49.0`): the canvas background reads `--u-canvas-bg-color`, which that package defines from 2.0.0. Without it the canvas still falls back to its built-in white, so nothing breaks on an older install; the floor only states where the tokens are all defined.
 - **Selecting from code no longer raises `timeline-task-select`.** `selectTask(id)` sets the selection quietly and `scrollToTask(id)`
   only scrolls — it no longer selects. The event is raised when the user selects (pointer press on a task). An app that updates its own
   state from the event and then calls `selectTask` no longer gets the event back. Code that relied on `scrollToTask` to select calls
