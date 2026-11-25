@@ -149,6 +149,7 @@ export class CollisionLayoutEngine {
           width: Math.max(this.options.minTaskWidth, width),
           height: scaledTaskHeight,
           row,
+          baseline: this.baselinePixels(task, timeScale),
         });
       }
 
@@ -198,6 +199,7 @@ export class CollisionLayoutEngine {
         width: Math.max(this.options.minTaskWidth, width),
         height: this.options.taskHeight,
         row,
+        baseline: this.baselinePixels(task, timeScale),
       });
     }
 
@@ -257,21 +259,29 @@ export class CollisionLayoutEngine {
 
     if (tasks.length === 0) return assignments;
 
-    // 시작 시간 기준 정렬
-    const sorted = [...tasks].sort((a, b) => a.start.getTime() - b.start.getTime());
+    // 막대 + 기준 구간의 합집합 — 기준 구간이 옆 줄 작업과 겹쳐 그려지지 않게 한다(기준이 없으면 막대 그대로)
+    const extents = new Map<string, { startX: number; endX: number }>();
+    for (const task of tasks) {
+      const taskStartX = timeScale.dateToX(task.start);
+      const naturalWidth = timeScale.dateToX(task.end) - taskStartX;
+      // minTaskWidth를 고려한 실제 종료 X 계산 — 겹침 판정은 실제 task 범위 기준 (padding 없이)
+      let startX = taskStartX;
+      let endX = taskStartX + Math.max(this.options.minTaskWidth, naturalWidth);
+      if (task.baseline) {
+        startX = Math.min(startX, timeScale.dateToX(task.baseline.start));
+        endX = Math.max(endX, timeScale.dateToX(task.baseline.end));
+      }
+      extents.set(task.id, { startX, endX });
+    }
 
-    // 각 행의 종료 시간 추적
+    // 시작 위치 기준 정렬
+    const sorted = [...tasks].sort((a, b) => extents.get(a.id)!.startX - extents.get(b.id)!.startX);
+
+    // 각 행의 종료 위치 추적
     const rowEndTimes: number[] = [];
 
     for (const task of sorted) {
-      const startX = timeScale.dateToX(task.start);
-      const naturalEndX = timeScale.dateToX(task.end);
-      const naturalWidth = naturalEndX - startX;
-
-      // minTaskWidth를 고려한 실제 종료 X 계산
-      const actualWidth = Math.max(this.options.minTaskWidth, naturalWidth);
-      // 겹침 판정은 실제 task 범위 기준 (padding 없이)
-      const endX = startX + actualWidth;
+      const { startX, endX } = extents.get(task.id)!;
 
       // 사용 가능한 행 찾기 (비어 있는 가장 위 행 — 시작 순으로 놓으므로 행 수는 가장 깊은 겹침과 같다)
       let assignedRow = -1;
@@ -289,12 +299,19 @@ export class CollisionLayoutEngine {
         rowEndTimes.push(0);
       }
 
-      // 행 할당 및 종료 시간 업데이트
+      // 행 할당 및 종료 위치 업데이트
       assignments.set(task.id, assignedRow);
       rowEndTimes[assignedRow] = endX;
     }
 
     return assignments;
+  }
+
+  /** 기준 구간의 픽셀 범위 — 없으면 `undefined` */
+  private baselinePixels<T>(task: Task<T>, timeScale: TimeScale): { x: number; width: number } | undefined {
+    if (!task.baseline) return undefined;
+    const { start, width } = timeScale.rangeToPixels(task.baseline);
+    return { x: start, width };
   }
 
   /**

@@ -184,8 +184,9 @@ export class TaskRenderer {
         // 뷰포트 좌표로 X 변환
         const viewportX = layoutedTask.x - scrollX;
 
-        // 뷰포트 밖 Task 스킵
-        if (viewportX + layoutedTask.width < 0 || viewportX > this.width) continue;
+        // 뷰포트 밖 Task 스킵 — 기준 구간까지 포함한 범위로
+        const extent = this.extentOf(layoutedTask);
+        if (extent.right - scrollX < 0 || extent.left - scrollX > this.width) continue;
 
         const taskY = contextY + layoutedTask.y;
         if (taskY + layoutedTask.height < 0 || taskY > this.height) continue;
@@ -204,6 +205,7 @@ export class TaskRenderer {
           ...layoutedTask,
           x: viewportX,
           y: taskY,
+          baseline: layoutedTask.baseline && { ...layoutedTask.baseline, x: layoutedTask.baseline.x - scrollX },
         };
 
         this.template.render(viewportTask, renderContext, state);
@@ -219,7 +221,7 @@ export class TaskRenderer {
 
     // 드래그 중인 Task (최상위에 렌더링)
     if (options.draggingTaskId && options.draggingPosition) {
-      this.renderDraggingTask(contexts, options, renderContext);
+      this.renderDraggingTask(contexts, options, renderContext, scrollX);
     }
   }
 
@@ -275,8 +277,9 @@ export class TaskRenderer {
         const taskY = contextY + layoutedTask.y;
 
         // 영역과 겹치지 않으면 스킵
-        if (layoutedTask.x + layoutedTask.width < region.x ||
-            layoutedTask.x > region.x + region.width ||
+        const extent = this.extentOf(layoutedTask);
+        if (extent.right < region.x ||
+            extent.left > region.x + region.width ||
             taskY + layoutedTask.height < region.y ||
             taskY > region.y + region.height) {
           continue;
@@ -477,6 +480,7 @@ export class TaskRenderer {
     contexts: ContextLayoutResult[],
     options: RenderOptions,
     renderContext: RenderContext,
+    scrollX: number,
   ): void {
     // 드래그 중인 Task 찾기
     let draggingTask: LayoutedTask | null = null;
@@ -498,6 +502,8 @@ export class TaskRenderer {
       y: options.draggingPosition.y,
       width: options.draggingPosition.width ?? draggingTask.width,
       height: options.draggingPosition.height ?? draggingTask.height,
+      // 기준 구간은 제자리에 둔다 — 시간 위치는 끌어도 바뀌지 않는다
+      baseline: draggingTask.baseline && { ...draggingTask.baseline, x: draggingTask.baseline.x - scrollX },
     };
 
     // 반투명 효과로 드래그 중임을 표시
@@ -511,6 +517,14 @@ export class TaskRenderer {
     });
 
     this.ctx.restore();
+  }
+
+  /** 막대와 기준 구간을 모두 덮는 가로 범위 — 보이는지 판정할 때 쓴다 */
+  private extentOf(layoutedTask: LayoutedTask): { left: number; right: number } {
+    const { x, width, baseline } = layoutedTask;
+    return baseline
+      ? { left: Math.min(x, baseline.x), right: Math.max(x + width, baseline.x + baseline.width) }
+      : { left: x, right: x + width };
   }
 
   /**

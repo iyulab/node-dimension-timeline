@@ -27,6 +27,11 @@
   That lane used to be a row named `(none)` on the canvas with no row on the left; it now has both, and the name follows `locale` and
   `labels` like the other wording. `NO_DIMENSION_VALUE` is the key that lane groups under.
 
+- **`Task.baseline` — a reference interval drawn with the bar.** A task can carry `baseline: { start, end }` (planned vs actual, promised vs
+  taken, booked vs used). The default template draws it as an outline under the bar (`--timeline-task-baseline`, or
+  `TaskStyleConfig.baseline`), the layout counts the union of the bar and its baseline when it assigns rows — so a baseline never overlaps
+  a task on the next row — and `LayoutedTask.baseline` gives its pixel range (`{ x, width }`) to custom templates. The baseline is not
+  hit-tested and is not dragged with the bar.
 - **The canvas follows the app theme.** Every colour painted on the canvas is now a CSS colour expression read as `--timeline-*` knob
   → `@iyulab/components` token → the previous built-in colour: the background (`--timeline-canvas-bg`), grid lines, the now line, row
   stripes, context dividers, the selection line, and the task bars per status (`--timeline-task-{bg,border,text}`,

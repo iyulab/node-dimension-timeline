@@ -137,3 +137,59 @@ describe('캔버스 색 — 손잡이 → 토큰 → 지금 색', () => {
     near(bar(el), [180, 20, 30]);
   });
 });
+
+describe('기준 구간(baseline) 윤곽', () => {
+  async function mountBaseline(style = ''): Promise<Timeline> {
+    const el = document.createElement('d-dimension-timeline') as unknown as Timeline;
+    el.setAttribute('style', `display:block; width:380px; height:300px; ${style}`);
+    document.body.appendChild(el);
+    const now = Date.now();
+    el.dataSource = new ArrayDataSource([
+      {
+        id: 't1',
+        start: new Date(now + 2 * HOUR),
+        end: new Date(now + 3 * HOUR),
+        dimensions: { worker: 'A' },
+        label: '',
+        baseline: { start: new Date(now), end: new Date(now + 3 * HOUR) },
+      },
+    ]);
+    el.dimensions = [{ key: 'worker', label: 'Worker' }];
+    el.activeDimension = 'worker';
+    el.setAttribute('scale', 'hour');
+    await el.updateComplete;
+    await frame();
+    el.scrollToTask('t1');
+    await frame();
+    await frame();
+    return el;
+  }
+
+  /** 기준 구간만 있는 가로 구간(막대 왼쪽)의 윗변 한가운데 */
+  function topEdge(el: Timeline) {
+    const { host, inner } = canvasOf(el);
+    const cached = host.getTaskById('t1')!;
+    const lt = cached.layoutedTask as { x: number; y: number; width: number; height: number; baseline?: { x: number; width: number } };
+    expect(lt.baseline, '배치가 기준 구간의 픽셀 범위를 갖는다').toBeTruthy();
+    const x = lt.baseline!.x + (lt.x - lt.baseline!.x) / 2 - (host.scrollX ?? 0);
+    const y = cached.absoluteY - (host.scrollY ?? 0);
+    // 윤곽은 윗변 선(두께 1.5)이라 한 픽셀 위·아래 중 칠해진 쪽을 읽는다
+    return [pixel(inner, x, y - 1), pixel(inner, x, y)] as const;
+  }
+
+  it('🔴막대 왼쪽의 기준 구간에 윤곽 선이 칠해진다', async () => {
+    const el = await mountBaseline('--timeline-task-baseline: rgb(255, 0, 0);');
+    const [above, on] = topEdge(el);
+    const reddest = [above, on].reduce((a, b) => (b[0] - b[1] > a[0] - a[1] ? b : a));
+    expect(reddest[0] - reddest[1], `윗변 픽셀 ${above} · ${on}`).toBeGreaterThan(100);
+  });
+
+  it('NEGATIVE: 기준 구간이 없는 작업에는 그 자리가 비어 있다', async () => {
+    const el = await mount('--timeline-task-baseline: rgb(255, 0, 0);');
+    const { host, inner } = canvasOf(el);
+    const cached = host.getTaskById('t1')!;
+    const lt = cached.layoutedTask;
+    const [r, g] = pixel(inner, lt.x - 20 - (host.scrollX ?? 0), cached.absoluteY - (host.scrollY ?? 0));
+    expect(r - g).toBeLessThan(40);
+  });
+});

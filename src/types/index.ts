@@ -32,6 +32,11 @@ export interface Task<T = unknown> {
   status?: TaskStatus;
   /** 진행률 (0-100) */
   progress?: number;
+  /**
+   * 비교 기준 구간(계획 · 약속 · 예약 …) — 같은 줄에 막대 아래 윤곽으로 그려진다. `start` ~ `end` 가 «실제» 이고 `baseline` 이
+   * «기준» 이다. 충돌 배치는 막대와 기준 구간의 합집합으로 겹침을 가려, 기준 구간이 옆 줄 작업에 겹쳐 그려지지 않는다.
+   */
+  baseline?: { start: Date; end: Date };
   /** 사용자 정의 메타데이터 */
   metadata?: T;
 }
@@ -208,6 +213,8 @@ export interface LayoutedTask<T = unknown> {
   height: number;
   /** 할당된 행 번호 (충돌 레이아웃 결과) */
   row: number;
+  /** 기준 구간(`task.baseline`)의 X 좌표 · 너비(픽셀) — `x` 와 같은 좌표계 */
+  baseline?: { x: number; width: number };
 }
 
 /**

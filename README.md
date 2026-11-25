@@ -228,6 +228,7 @@ Context 내부에서 Task를 배치하는 핵심 엔진입니다.
 | `--timeline-task-bg` · `-border` · `-text` | `--u-info-color` · `--u-info-color-strong` | 기본 · 진행 중 막대 |
 | `--timeline-task-pending-*` · `--timeline-task-completed-*` · `--timeline-task-cancelled-*` (`-bg` `-border` `-text`) | `--u-neutral-500/600` · `--u-success-color[-strong]` · `--u-danger-color[-strong]` | 상태별 막대 |
 | `--timeline-task-selected-border` | `--u-info-color-strong` | 고른 막대의 테두리 |
+| `--timeline-task-baseline` | `--u-neutral-500` | 기준 구간(`task.baseline`) 윤곽 |
 
 작업의 `color` 와 템플릿 설정(`TaskStyleConfig`)에도 `var(--u-danger-color)` 같은 색 표현을 쓸 수 있다.
 
@@ -243,6 +244,7 @@ type Task = {
   color?: string
   status?: 'pending' | 'in-progress' | 'completed' | 'cancelled'
   progress?: number  // 0-100
+  baseline?: { start: Date; end: Date }  // 비교 기준 구간(계획 · 약속 · 예약) — 막대 아래 윤곽
   metadata?: Record<string, any>
 }
 ```
@@ -257,6 +259,9 @@ type Task = {
 | 기준    | 작업 구조       | 관심 차원              |
 | 중첩 처리 | 고정 행        | 자동 개행              |
 | 목적    | 계획 관리       | 흐름·밀집도 인식          |
+
+`baseline` 은 간트의 «기준선» 을 들여오는 것이 아니다 — 줄의 의미는 여전히 없고, **막대 하나의 표현력**(계획 대 실적 · 약속 대 소요 · 예약 대 사용 같이
+시간 구간을 기준과 견주는 것)만 더한다. 기준 구간도 충돌 배치에 들어가 옆 줄 작업과 겹쳐 그려지지 않는다.
 
 ---
 

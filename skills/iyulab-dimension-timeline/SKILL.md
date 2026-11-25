@@ -77,6 +77,7 @@ type Task<T = unknown> = {
   color?: string;
   status?: 'pending' | 'in-progress' | 'completed' | 'cancelled';
   progress?: number;                              // 0-100
+  baseline?: { start: Date; end: Date };          // reference interval (plan / promise / booking), drawn as an outline under the bar
   metadata?: T;
 };
 
@@ -84,6 +85,9 @@ type Dimension = { key: string; label: string; icon?: string; values?: { key: st
 ```
 
 A dimension is an attribute of the data, not a structure: do not give the lanes meaning of their own.
+
+`baseline` compares an interval against a reference (planned vs actual, promised vs taken, booked vs used) inside one bar. It does not give
+lanes a meaning: the lane layout also counts the baseline, so a baseline never overlaps a task on the next row. Colour: `--timeline-task-baseline`.
 
 ## Data sources
 

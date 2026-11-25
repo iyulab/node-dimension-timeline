@@ -45,6 +45,33 @@ describe('CollisionLayoutEngine — row assignment', () => {
   });
 });
 
+describe('CollisionLayoutEngine — baseline', () => {
+  const engine = new CollisionLayoutEngine({ minTaskWidth: 0 });
+  const withBaseline = (t: Task, from: number, to: number): Task => ({ ...t, baseline: { start: at(from), end: at(to) } });
+
+  test('a baseline that reaches into the next task pushes that task to another row', () => {
+    // 막대는 0~30분이고 기준은 0~60분 — 둘째(40~70분)는 막대와는 겹치지 않지만 기준과는 겹친다
+    const tasks = [withBaseline(task('a', 0, 30), 0, 60), task('b', 40, 70)];
+    expect(rows(engine, tasks)).toEqual({ a: 0, b: 1 });
+  });
+
+  test('NEGATIVE: a baseline inside the bar, or none, changes nothing', () => {
+    expect(rows(engine, [withBaseline(task('a', 0, 60), 10, 50), task('b', 60, 90)])).toEqual({ a: 0, b: 0 });
+    expect(rows(engine, [task('a', 0, 30), task('b', 40, 70)])).toEqual({ a: 0, b: 0 });
+  });
+
+  test('a baseline that starts before the bar blocks the row from its own start', () => {
+    const tasks = [task('a', 0, 20), withBaseline(task('b', 30, 60), 10, 60)];
+    expect(rows(engine, tasks)).toEqual({ a: 0, b: 1 });
+  });
+
+  test('the layouted task carries the baseline in pixels (1 minute = 1px)', () => {
+    const [placed] = engine.layoutContext([withBaseline(task('a', 30, 60), 10, 90)], scale()).tasks;
+    expect(placed.baseline).toEqual({ x: 10, width: 80 });
+    expect(engine.layoutContext([task('a', 30, 60)], scale()).tasks[0].baseline).toBeUndefined();
+  });
+});
+
 describe('CollisionLayoutEngine — layout by dimension', () => {
   const engine = new CollisionLayoutEngine({ taskHeight: 20, taskGap: 4, minTaskWidth: 0 });
 

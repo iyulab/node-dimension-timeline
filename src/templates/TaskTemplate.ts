@@ -72,6 +72,8 @@ export interface TaskStyleConfig {
   resizeHandleWidth: number;
   /** 리사이즈 핸들 색상 */
   resizeHandleColor: string;
+  /** 기준 구간(`task.baseline`) 윤곽 — 막대 아래에 그려진다 */
+  baseline?: { borderColor: string; borderWidth: number };
 }
 
 /**
@@ -135,6 +137,10 @@ export const DEFAULT_STYLE_CONFIG: TaskStyleConfig = {
   progressBarBgColor: 'rgba(0, 0, 0, 0.2)',
   resizeHandleWidth: 6,
   resizeHandleColor: 'rgba(255, 255, 255, 0.4)',
+  baseline: {
+    borderColor: 'var(--timeline-task-baseline, var(--u-neutral-500, #6B7280))',
+    borderWidth: 1.5,
+  },
 };
 
 /**

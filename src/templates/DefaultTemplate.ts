@@ -59,6 +59,18 @@ export class DefaultTemplate<T = unknown> implements TaskTemplate<T> {
       ? withAlpha(bgColor, style.opacity)
       : bgColor;
 
+    // 기준 구간 윤곽 — 막대 아래에(실제 막대가 위에 덮인다)
+    const baseline = layoutedTask.baseline;
+    const baselineStyle = config.baseline ?? DEFAULT_STYLE_CONFIG.baseline;
+    if (baseline && baseline.width >= 1 && baselineStyle) {
+      strokeRoundedRect(
+        ctx, baseline.x, y, baseline.width, height,
+        config.borderRadius,
+        resolve(baselineStyle.borderColor),
+        baselineStyle.borderWidth,
+      );
+    }
+
     // 배경 그리기
     fillRoundedRect(ctx, x, y, width, height, config.borderRadius, finalBgColor);
 
