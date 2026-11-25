@@ -17,6 +17,11 @@ export interface RenderContext {
   zoom: number;
   /** 현재 시간 */
   now: Date;
+  /**
+   * 색 표현(`var(--x, #fff)` · `light-dark()` 등)을 캔버스가 칠할 수 있는 색으로 푼다. 이미 `#rrggbb` · `rgb()` 이면 그대로 돌려준다.
+   * 템플릿이 설정 색(`TaskStyleConfig`) · `task.color` 를 칠하기 전에 거치면 앱 테마를 따른다. 없으면 풀지 않는다.
+   */
+  resolveColor?(color: string): string;
 }
 
 /**
@@ -75,43 +80,43 @@ export interface TaskStyleConfig {
 export const DEFAULT_STYLE_CONFIG: TaskStyleConfig = {
   states: {
     default: {
-      backgroundColor: '#3B82F6',
-      borderColor: '#2563EB',
-      textColor: '#FFFFFF',
+      backgroundColor: 'var(--timeline-task-bg, var(--u-info-color, #3B82F6))',
+      borderColor: 'var(--timeline-task-border, var(--u-info-color-strong, #2563EB))',
+      textColor: 'var(--timeline-task-text, #FFFFFF)',
       borderWidth: 1,
       opacity: 1,
     },
     pending: {
-      backgroundColor: '#9CA3AF',
-      borderColor: '#6B7280',
-      textColor: '#FFFFFF',
+      backgroundColor: 'var(--timeline-task-pending-bg, var(--u-neutral-500, #9CA3AF))',
+      borderColor: 'var(--timeline-task-pending-border, var(--u-neutral-600, #6B7280))',
+      textColor: 'var(--timeline-task-pending-text, var(--timeline-task-text, #FFFFFF))',
       borderWidth: 1,
       opacity: 0.8,
     },
     'in-progress': {
-      backgroundColor: '#3B82F6',
-      borderColor: '#2563EB',
-      textColor: '#FFFFFF',
+      backgroundColor: 'var(--timeline-task-in-progress-bg, var(--timeline-task-bg, var(--u-info-color, #3B82F6)))',
+      borderColor: 'var(--timeline-task-in-progress-border, var(--timeline-task-border, var(--u-info-color-strong, #2563EB)))',
+      textColor: 'var(--timeline-task-in-progress-text, var(--timeline-task-text, #FFFFFF))',
       borderWidth: 1,
       opacity: 1,
     },
     completed: {
-      backgroundColor: '#10B981',
-      borderColor: '#059669',
-      textColor: '#FFFFFF',
+      backgroundColor: 'var(--timeline-task-completed-bg, var(--u-success-color, #10B981))',
+      borderColor: 'var(--timeline-task-completed-border, var(--u-success-color-strong, #059669))',
+      textColor: 'var(--timeline-task-completed-text, var(--timeline-task-text, #FFFFFF))',
       borderWidth: 1,
       opacity: 1,
     },
     cancelled: {
-      backgroundColor: '#EF4444',
-      borderColor: '#DC2626',
-      textColor: '#FFFFFF',
+      backgroundColor: 'var(--timeline-task-cancelled-bg, var(--u-danger-color, #EF4444))',
+      borderColor: 'var(--timeline-task-cancelled-border, var(--u-danger-color-strong, #DC2626))',
+      textColor: 'var(--timeline-task-cancelled-text, var(--timeline-task-text, #FFFFFF))',
       borderWidth: 1,
       opacity: 0.6,
     },
   },
   selected: {
-    borderColor: '#1D4ED8',
+    borderColor: 'var(--timeline-task-selected-border, var(--u-info-color-strong, #1D4ED8))',
     borderWidth: 2,
   },
   hovered: {

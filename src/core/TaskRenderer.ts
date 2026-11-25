@@ -8,6 +8,7 @@ import type { ContextLayoutResult } from './CollisionLayoutEngine.js';
 import type { TaskTemplate, RenderContext } from '../templates/TaskTemplate.js';
 import { getTemplate } from '../templates/TemplateRegistry.js';
 import { setupHighDpiCanvas, clearCanvas, getDevicePixelRatio } from '../utilities/CanvasUtils.js';
+import { identityColorResolver, type ColorResolver } from '../utilities/ColorResolver.js';
 
 /**
  * 렌더링된 타임 영역 정보
@@ -78,17 +79,22 @@ export class TaskRenderer {
   private template: TaskTemplate;
 
   // 스타일 설정
-  private gridLineColor = 'rgba(0, 0, 0, 0.08)';
-  private gridLineMajorColor = 'rgba(0, 0, 0, 0.15)';
-  private nowMarkerColor = '#EF4444';
-  private backgroundColor = '#FFFFFF';
-  private alternatingRowColor = 'rgba(0, 0, 0, 0.02)';
+  // 칠하는 색은 색 표현이다 — 앱이 손잡이(`--timeline-*`)로 바꾸고, 없으면 `@iyulab/components` 토큰, 그것도 없으면 아래 색.
+  private gridLineColor = 'var(--timeline-grid-line, var(--u-border-color-weak, rgba(0, 0, 0, 0.08)))';
+  private gridLineMajorColor = 'var(--timeline-grid-line-major, var(--u-border-color, rgba(0, 0, 0, 0.15)))';
+  private nowMarkerColor = 'var(--timeline-now-marker, var(--u-danger-color, #EF4444))';
+  private backgroundColor = 'var(--timeline-canvas-bg, var(--u-canvas-bg-color, #FFFFFF))';
+  private alternatingRowColor = 'var(--timeline-row-alt, rgba(0, 0, 0, 0.02))';
   private timeRegionDefaultColor = 'rgba(100, 100, 100, 0.1)';
-  private selectedRowColor = 'rgba(239, 68, 68, 0.06)'; // 연한 빨간색
-  private contextDividerColor = 'rgba(0, 0, 0, 0.1)'; // Context 구분선 색상
-  private selectionLineColor = '#ef4444'; // 선택 라인 색상 (빨간색)
+  private selectedRowColor = 'var(--timeline-row-selected, rgba(239, 68, 68, 0.06))'; // 연한 빨간색
+  private contextDividerColor = 'var(--timeline-context-divider, var(--u-border-color, rgba(0, 0, 0, 0.1)))'; // Context 구분선 색상
+  private selectionLineColor = 'var(--timeline-selection-line, var(--u-danger-color, #ef4444))'; // 선택 라인 색상 (빨간색)
 
-  constructor(canvas: HTMLCanvasElement, templateName: string = 'default') {
+  /** 색 표현 → 칠할 색(앱 테마) */
+  private readonly colors: ColorResolver;
+
+  constructor(canvas: HTMLCanvasElement, templateName: string = 'default', colors: ColorResolver = identityColorResolver) {
+    this.colors = colors;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
     this.template = getTemplate(templateName);
@@ -132,10 +138,11 @@ export class TaskRenderer {
       dpr: getDevicePixelRatio(),
       zoom: 1,
       now: new Date(),
+      resolveColor: (color: string) => this.colors.resolve(color),
     };
 
     // 배경
-    this.ctx.fillStyle = this.backgroundColor;
+    this.ctx.fillStyle = this.colors.resolve(this.backgroundColor);
     this.ctx.fillRect(0, 0, this.width, this.height);
 
     // Context 배경 (짝수행 색상 또는 Dimension 색상)
@@ -232,11 +239,12 @@ export class TaskRenderer {
       dpr: getDevicePixelRatio(),
       zoom: 1,
       now: new Date(),
+      resolveColor: (color: string) => this.colors.resolve(color),
     };
 
     // 영역 클리어
     this.ctx.clearRect(region.x, region.y, region.width, region.height);
-    this.ctx.fillStyle = this.backgroundColor;
+    this.ctx.fillStyle = this.colors.resolve(this.backgroundColor);
     this.ctx.fillRect(region.x, region.y, region.width, region.height);
 
     // 클리핑 적용
@@ -331,7 +339,7 @@ export class TaskRenderer {
 
       // 선택된 row 배경 강조
       if (selectedDimensionValue && context.dimensionValue === selectedDimensionValue) {
-        this.ctx.fillStyle = this.selectedRowColor;
+        this.ctx.fillStyle = this.colors.resolve(this.selectedRowColor);
         this.ctx.fillRect(0, contextY, this.width, position.height);
       } else {
         // 색상 결정: Dimension 색상 우선, 없으면 짝수행 색상
@@ -343,14 +351,14 @@ export class TaskRenderer {
           this.ctx.fillRect(0, contextY, this.width, position.height);
         } else if (useAlternating && i % 2 === 1) {
           // 짝수행(0-indexed에서 홀수) 색상
-          this.ctx.fillStyle = this.alternatingRowColor;
+          this.ctx.fillStyle = this.colors.resolve(this.alternatingRowColor);
           this.ctx.fillRect(0, contextY, this.width, position.height);
         }
       }
 
       // Context 구분선 (상단/하단)
       if (showDividers) {
-        this.ctx.strokeStyle = this.contextDividerColor;
+        this.ctx.strokeStyle = this.colors.resolve(this.contextDividerColor);
         this.ctx.lineWidth = 1;
 
         // 상단 구분선
@@ -407,7 +415,7 @@ export class TaskRenderer {
     this.ctx.lineWidth = 1;
 
     for (const line of gridLines) {
-      this.ctx.strokeStyle = line.major ? this.gridLineMajorColor : this.gridLineColor;
+      this.ctx.strokeStyle = this.colors.resolve(line.major ? this.gridLineMajorColor : this.gridLineColor);
       this.ctx.beginPath();
       this.ctx.moveTo(Math.floor(line.x) + 0.5, 0);
       this.ctx.lineTo(Math.floor(line.x) + 0.5, this.height);
@@ -416,7 +424,7 @@ export class TaskRenderer {
   }
 
   private renderNowMarker(x: number): void {
-    this.ctx.strokeStyle = this.nowMarkerColor;
+    this.ctx.strokeStyle = this.colors.resolve(this.nowMarkerColor);
     this.ctx.lineWidth = 2;
     this.ctx.beginPath();
     this.ctx.moveTo(x, 0);
@@ -424,7 +432,7 @@ export class TaskRenderer {
     this.ctx.stroke();
 
     // 상단 삼각형
-    this.ctx.fillStyle = this.nowMarkerColor;
+    this.ctx.fillStyle = this.colors.resolve(this.nowMarkerColor);
     this.ctx.beginPath();
     this.ctx.moveTo(x, 0);
     this.ctx.lineTo(x - 6, 0);
@@ -453,7 +461,7 @@ export class TaskRenderer {
 
     // 가로 중앙선 그리기
     this.ctx.save();
-    this.ctx.strokeStyle = this.selectionLineColor;
+    this.ctx.strokeStyle = this.colors.resolve(this.selectionLineColor);
     this.ctx.lineWidth = 1;
     this.ctx.setLineDash([4, 4]); // 점선
 
@@ -508,7 +516,8 @@ export class TaskRenderer {
   /**
    * 색상에 alpha 적용 (hex, rgb, hsl 지원)
    */
-  private applyAlpha(color: string, alpha: number): string {
+  private applyAlpha(rawColor: string, alpha: number): string {
+    const color = this.colors.resolve(rawColor);
     // 이미 rgba/hsla 형식이면 그대로 반환
     if (color.startsWith('rgba') || color.startsWith('hsla')) {
       return color;

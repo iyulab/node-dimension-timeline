@@ -111,7 +111,7 @@ objects, so subscribers are notified.
 | `realtimeInterval` (`realtime-interval`) | `number` | `60000` | Now-marker refresh in ms |
 
 Methods: `selectTask(id)`, `scrollToDate(date, position?)`, `scrollToTask(id)`, `scrollToDimensionValue(value)`,
-`setScale(scale)`, `setActiveDimension(key)`, `refresh()`. `selectTask(id)` sets the selection without raising
+`setScale(scale)`, `setActiveDimension(key)`, `refresh()`, `refreshTheme()`. `selectTask(id)` sets the selection without raising
 `timeline-task-select`, and `scrollToTask(id)` only scrolls — the event is for the user's own selection.
 
 ## Events
@@ -148,6 +148,12 @@ value for the active dimension.
 Style it through CSS custom properties set on `d-dimension-timeline`: sizes such as `--time-axis-height`, and colours
 grouped by area prefixes such as `--timeline-*`, `--time-axis-*` and `--context-*`. Every property has a fallback, so
 nothing needs to be set. The full list is in the package `README.md`.
+
+The canvas colours (bar per status, grid, now line, background) follow the app theme the same way: each is read as
+`--timeline-*` knob, then the `@iyulab/components` token, then a built-in colour — for example `--timeline-canvas-bg`,
+`--timeline-task-completed-bg`, `--timeline-now-marker`. They are resolved inside the element (`var()` chains and `light-dark()` work)
+and re-resolved when the document root's `class` / `style` / `data-*` or `prefers-color-scheme` changes. If you change a variable on
+another ancestor, call `refreshTheme()` (or `refresh()`). A task's `color` may be such an expression too (`var(--u-danger-color)`).
 
 ## Machine-readable reference
 

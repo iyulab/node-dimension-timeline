@@ -1055,9 +1055,15 @@ export class DimensionTimeline<T = unknown> extends LitElement {
     this.activeDimension = dimension;
   }
 
-  /** 데이터 새로고침 */
+  /** 데이터 새로고침 — 캔버스 색도 다시 푼다(조상에서 바꾼 테마 변수를 따른다) */
   async refresh(): Promise<void> {
+    this.refreshTheme();
     await this.loadData();
+  }
+
+  /** 캔버스 색만 다시 푼다 — 문서 루트 밖에서 테마 변수를 바꾼 뒤 부른다 */
+  refreshTheme(): void {
+    this.canvasEl?.refreshTheme();
   }
 
   // =========================================================================

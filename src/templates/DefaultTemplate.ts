@@ -38,12 +38,21 @@ export class DefaultTemplate<T = unknown> implements TaskTemplate<T> {
     // 최소 너비 체크
     if (width < 4) return;
 
+    // 설정 색 · task.color 는 색 표현일 수 있다 — 칠하기 전에 앱 테마로 푼다
+    const resolve = context.resolveColor ?? ((c: string) => c);
+
     // 상태별 스타일 결정
     const baseStyle = this.getStateStyle(task.status);
-    const style = this.applyStateOverrides(baseStyle, state);
+    const overridden = this.applyStateOverrides(baseStyle, state);
+    const style: TaskStateStyle = {
+      ...overridden,
+      backgroundColor: resolve(overridden.backgroundColor),
+      borderColor: resolve(overridden.borderColor),
+      textColor: resolve(overridden.textColor),
+    };
 
     // Task 배경색 (task.color 우선)
-    const bgColor = task.color ?? style.backgroundColor;
+    const bgColor = task.color ? resolve(task.color) : style.backgroundColor;
 
     // 투명도 적용
     const finalBgColor = style.opacity < 1
@@ -68,7 +77,7 @@ export class DefaultTemplate<T = unknown> implements TaskTemplate<T> {
       strokeRoundedRect(
         ctx, x - 1, y - 1, width + 2, height + 2,
         config.borderRadius + 1,
-        config.selected.borderColor ?? '#1D4ED8',
+        resolve(config.selected.borderColor ?? '#1D4ED8'),
         config.selected.borderWidth ?? 2
       );
     }
@@ -240,7 +249,8 @@ export class MinimalTemplate<T = unknown> implements TaskTemplate<T> {
     if (width < 2) return;
 
     // 배경색
-    const bgColor = task.color ?? this.styleConfig.states.default.backgroundColor;
+    const resolve = context.resolveColor ?? ((c: string) => c);
+    const bgColor = resolve(task.color ?? this.styleConfig.states.default.backgroundColor);
     const opacity = state.dragging ? 0.6 : state.hovered ? 0.85 : 1;
 
     ctx.fillStyle = withAlpha(bgColor, opacity);

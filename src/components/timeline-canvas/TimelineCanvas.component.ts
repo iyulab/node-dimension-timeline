@@ -11,6 +11,7 @@ import type { HitTestResult, HitArea } from '../../types/index.js';
 import type { ContextLayoutResult } from '../../core/CollisionLayoutEngine.js';
 import type { GridLine, RenderedTimeRegion, ContextColorInfo } from '../../core/TaskRenderer.js';
 import { TaskRenderer } from '../../core/TaskRenderer.js';
+import { ProbeColorResolver } from '../../utilities/ColorResolver.js';
 import { HitTestManager } from '../../core/HitTestManager.js';
 
 /**
@@ -118,10 +119,15 @@ export class TimelineCanvas<T = unknown> extends LitElement {
   // =========================================================================
 
   @query('canvas') private canvas!: HTMLCanvasElement;
+  @query('.color-probe') private colorProbe!: HTMLElement;
 
   private renderer: TaskRenderer | null = null;
   private hitTestManager: HitTestManager<T> = new HitTestManager();
   private resizeObserver: ResizeObserver | null = null;
+  private colors: ProbeColorResolver | null = null;
+  private themeObserver: MutationObserver | null = null;
+  private colorScheme: MediaQueryList | null = null;
+  private themeFrame = 0;
 
   private width: number = 0;
   private height: number = 0;
@@ -132,6 +138,9 @@ export class TimelineCanvas<T = unknown> extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+
+    // 문서에서 떼었다 다시 붙인 요소 — 테마 감시는 떼질 때 멈췄다
+    if (this.renderer) this.watchTheme();
 
     this.resizeObserver = new ResizeObserver(entries => {
       for (const entry of entries) {
@@ -146,6 +155,7 @@ export class TimelineCanvas<T = unknown> extends LitElement {
   disconnectedCallback(): void {
     super.disconnectedCallback();
     this.resizeObserver?.disconnect();
+    this.stopWatchingTheme();
   }
 
   protected firstUpdated(_changedProperties: PropertyValues): void {
@@ -153,9 +163,50 @@ export class TimelineCanvas<T = unknown> extends LitElement {
 
     // 2D 문맥이 없는 환경(DOM 흉내 시험 환경 등)에서는 그리지 않는다 — 요소는 마운트되고 오류는 나지 않는다.
     if (this.canvas?.getContext('2d')) {
-      this.renderer = new TaskRenderer(this.canvas, this.template);
+      this.colors = new ProbeColorResolver(this.colorProbe);
+      this.renderer = new TaskRenderer(this.canvas, this.template, this.colors);
+      this.watchTheme();
       this.requestRender();
     }
+  }
+
+  /**
+   * 칠하는 색을 다시 풀어 다시 그린다 — 캔버스는 CSS 를 상속하지 않아 변수가 바뀐 것을 스스로 알 수 없다.
+   * 문서 루트의 `class` · `style` · `data-*` 변경과 `prefers-color-scheme` 변경은 스스로 알아차린다. 그 밖의 조상에서 변수를 바꾸는
+   * 앱이 부른다.
+   */
+  refreshTheme(): void {
+    this.colors?.invalidate();
+    this.requestRender();
+  }
+
+  private watchTheme(): void {
+    if (this.themeObserver) return;
+    const onChange = () => {
+      if (this.themeFrame) return;
+      this.themeFrame = requestAnimationFrame(() => {
+        this.themeFrame = 0;
+        this.refreshTheme();
+      });
+    };
+    this.themeObserver = new MutationObserver(onChange);
+    this.themeObserver.observe(document.documentElement, { attributes: true });
+    if (document.body) this.themeObserver.observe(document.body, { attributes: true });
+    this.colorScheme = window.matchMedia?.('(prefers-color-scheme: dark)') ?? null;
+    this.colorScheme?.addEventListener('change', onChange);
+    this.onSchemeChange = onChange;
+  }
+
+  private onSchemeChange: (() => void) | null = null;
+
+  private stopWatchingTheme(): void {
+    this.themeObserver?.disconnect();
+    this.themeObserver = null;
+    if (this.onSchemeChange) this.colorScheme?.removeEventListener('change', this.onSchemeChange);
+    this.onSchemeChange = null;
+    this.colorScheme = null;
+    if (this.themeFrame) cancelAnimationFrame(this.themeFrame);
+    this.themeFrame = 0;
   }
 
   protected updated(changedProperties: PropertyValues): void {
@@ -196,6 +247,7 @@ export class TimelineCanvas<T = unknown> extends LitElement {
           @dblclick=${this.handleDoubleClick}
         ></canvas>
       </div>
+      <span class="color-probe" hidden aria-hidden="true"></span>
       <div class="loading-overlay">
         <slot name="loading">Loading...</slot>
       </div>

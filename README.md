@@ -212,6 +212,25 @@ Context 내부에서 Task를 배치하는 핵심 엔진입니다.
 
 `@iyulab/components` 토큰이 있으면 모션 지속시간(`--u-duration-*`)과 떠 있는 층(`--u-layer-floating`)을 거기서 읽는다.
 
+**캔버스 색** — 작업 막대 · 격자 · 지금 선처럼 캔버스에 칠하는 색도 같은 손잡이로 바꾼다. 읽는 순서는 «손잡이 → `@iyulab/components` 토큰 →
+기본 색» 이고, 칠할 때마다 요소 안에서 풀어(`var()` 사슬 · `light-dark()` 포함) 테마를 따른다.
+문서 루트의 `class` · `style` · `data-*` 가 바뀌거나 `prefers-color-scheme` 이 바뀌면 스스로 다시 그리고, 그 밖의 조상에서 변수를 바꿨다면
+`timeline.refreshTheme()`(또는 `refresh()`)을 부른다.
+
+| 속성 | 토큰 폴백 | 무엇 |
+|---|---|---|
+| `--timeline-canvas-bg` | `--u-canvas-bg-color` | 캔버스 바탕 |
+| `--timeline-grid-line` · `--timeline-grid-line-major` | `--u-border-color-weak` · `--u-border-color` | 격자 선 |
+| `--timeline-now-marker` | `--u-danger-color` | 지금 선 |
+| `--timeline-row-alt` · `--timeline-row-selected` | | 짝수 줄 · 고른 작업의 줄 |
+| `--timeline-context-divider` | `--u-border-color` | 맥락 사이 구분선 |
+| `--timeline-selection-line` | `--u-danger-color` | 선택 선 |
+| `--timeline-task-bg` · `-border` · `-text` | `--u-info-color` · `--u-info-color-strong` | 기본 · 진행 중 막대 |
+| `--timeline-task-pending-*` · `--timeline-task-completed-*` · `--timeline-task-cancelled-*` (`-bg` `-border` `-text`) | `--u-neutral-500/600` · `--u-success-color[-strong]` · `--u-danger-color[-strong]` | 상태별 막대 |
+| `--timeline-task-selected-border` | `--u-info-color-strong` | 고른 막대의 테두리 |
+
+작업의 `color` 와 템플릿 설정(`TaskStyleConfig`)에도 `var(--u-danger-color)` 같은 색 표현을 쓸 수 있다.
+
 ## 데이터 모델 예시
 
 ```ts

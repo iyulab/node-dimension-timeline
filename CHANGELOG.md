@@ -27,6 +27,16 @@
   That lane used to be a row named `(none)` on the canvas with no row on the left; it now has both, and the name follows `locale` and
   `labels` like the other wording. `NO_DIMENSION_VALUE` is the key that lane groups under.
 
+- **The canvas follows the app theme.** Every colour painted on the canvas is now a CSS colour expression read as `--timeline-*` knob
+  → `@iyulab/components` token → the previous built-in colour: the background (`--timeline-canvas-bg`), grid lines, the now line, row
+  stripes, context dividers, the selection line, and the task bars per status (`--timeline-task-{bg,border,text}`,
+  `--timeline-task-{pending,in-progress,completed,cancelled}-{bg,border,text}`, `--timeline-task-selected-border`). The expressions are
+  resolved inside the element (`var()` chains, `light-dark()` and modern colour functions work) and re-resolved when the document root's
+  `class`, `style` or `data-*` change or `prefers-color-scheme` flips; for a variable changed on another ancestor call
+  `refreshTheme()` (also done by `refresh()`). `Task.color` and `TaskStyleConfig` colours may be such expressions, and
+  `RenderContext.resolveColor` lets a custom template resolve them. With no knob and no token the colours are the same as before; where
+  the tokens exist the bars, grid and now line follow them.
+
 ### Changed
 
 - **Selecting from code no longer raises `timeline-task-select`.** `selectTask(id)` sets the selection quietly and `scrollToTask(id)`
