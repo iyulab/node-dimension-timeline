@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- **The text on a task bar is readable at rest and on hover, in every status.** White labels sat on fills as low as 2.1:1
+  — the pending and cancelled bars were drawn faded (opacity 0.8 and 0.6) and a hovered bar lightened every state further.
+  States are told apart by colour only, a hovered bar gets a thicker border, and each state's label takes the colour paired
+  with its fill (`--u-info-txt-color`, `--u-success-txt-color`, `--u-danger-txt-color`). Pending bars use
+  `--u-neutral-600` with a `--u-neutral-700` border (was 500 and 600). To keep the faded look, set `opacity` on the state in
+  the template's style configuration. The bar being dragged is still drawn translucent, so what lies under it stays
+  visible.
+- **The baseline outline stands out from the canvas.** It reads `--u-neutral-600` (was 500, under 3:1 against the canvas
+  background).
+
+### Changed
+
+- **Without the `@iyulab/components` token sheet the default colours are now that sheet's light values**, the same colours an
+  app with the sheet already sees: the canvas background is `#F5F5F5` (was white), grid lines and the context divider
+  `#EEEEEE` / `#E0E0E0`, the now marker and the selection line `#D32F2F`, the selected border `#1565C0`, and the task bars
+  `#1976D2`, `#757575`, `#2E7D32` and `#D32F2F`. Apps that set `--timeline-*` or `--u-*` variables see no change. To keep an
+  old colour, set its `--timeline-*` variable.
+
 ## [0.5.0] - 2026-11-25
 
 ### Fixed

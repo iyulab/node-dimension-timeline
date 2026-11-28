@@ -80,15 +80,15 @@ export class TaskRenderer {
 
   // 스타일 설정
   // 칠하는 색은 색 표현이다 — 앱이 손잡이(`--timeline-*`)로 바꾸고, 없으면 `@iyulab/components` 토큰, 그것도 없으면 아래 색.
-  private gridLineColor = 'var(--timeline-grid-line, var(--u-border-color-weak, rgba(0, 0, 0, 0.08)))';
-  private gridLineMajorColor = 'var(--timeline-grid-line-major, var(--u-border-color, rgba(0, 0, 0, 0.15)))';
-  private nowMarkerColor = 'var(--timeline-now-marker, var(--u-danger-color, #EF4444))';
-  private backgroundColor = 'var(--timeline-canvas-bg, var(--u-canvas-bg-color, #FFFFFF))';
+  private gridLineColor = 'var(--timeline-grid-line, var(--u-border-color-weak, #EEEEEE))';
+  private gridLineMajorColor = 'var(--timeline-grid-line-major, var(--u-border-color, #E0E0E0))';
+  private nowMarkerColor = 'var(--timeline-now-marker, var(--u-danger-color, #D32F2F))';
+  private backgroundColor = 'var(--timeline-canvas-bg, var(--u-canvas-bg-color, #F5F5F5))';
   private alternatingRowColor = 'var(--timeline-row-alt, rgba(0, 0, 0, 0.02))';
   private timeRegionDefaultColor = 'rgba(100, 100, 100, 0.1)';
   private selectedRowColor = 'var(--timeline-row-selected, rgba(239, 68, 68, 0.06))'; // 연한 빨간색
-  private contextDividerColor = 'var(--timeline-context-divider, var(--u-border-color, rgba(0, 0, 0, 0.1)))'; // Context 구분선 색상
-  private selectionLineColor = 'var(--timeline-selection-line, var(--u-danger-color, #ef4444))'; // 선택 라인 색상 (빨간색)
+  private contextDividerColor = 'var(--timeline-context-divider, var(--u-border-color, #E0E0E0))'; // Context 구분선 색상
+  private selectionLineColor = 'var(--timeline-selection-line, var(--u-danger-color, #D32F2F))'; // 선택 라인 색상 (빨간색)
 
   /** 색 표현 → 칠할 색(앱 테마) */
   private readonly colors: ColorResolver;

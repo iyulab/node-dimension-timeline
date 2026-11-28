@@ -80,49 +80,51 @@ export interface TaskStyleConfig {
  * 기본 스타일 설정
  */
 export const DEFAULT_STYLE_CONFIG: TaskStyleConfig = {
+  // 막대와 그 위 글자는 «채움색 + 짝 글자색» 으로 읽는다. 상태를 불투명도로 흐리지 않는다 — 바탕과 섞인
+  // 채움 위의 글자는 대비가 4.5:1 아래로 내려간다. 호버도 같은 이유로 테두리로 알린다.
   states: {
     default: {
-      backgroundColor: 'var(--timeline-task-bg, var(--u-info-color, #3B82F6))',
-      borderColor: 'var(--timeline-task-border, var(--u-info-color-strong, #2563EB))',
-      textColor: 'var(--timeline-task-text, #FFFFFF)',
+      backgroundColor: 'var(--timeline-task-bg, var(--u-info-color, #1976D2))',
+      borderColor: 'var(--timeline-task-border, var(--u-info-color-strong, #1565C0))',
+      textColor: 'var(--timeline-task-text, var(--u-info-txt-color, #FFFFFF))',
       borderWidth: 1,
       opacity: 1,
     },
     pending: {
-      backgroundColor: 'var(--timeline-task-pending-bg, var(--u-neutral-500, #9CA3AF))',
-      borderColor: 'var(--timeline-task-pending-border, var(--u-neutral-600, #6B7280))',
+      backgroundColor: 'var(--timeline-task-pending-bg, var(--u-neutral-600, #757575))',
+      borderColor: 'var(--timeline-task-pending-border, var(--u-neutral-700, #616161))',
       textColor: 'var(--timeline-task-pending-text, var(--timeline-task-text, #FFFFFF))',
       borderWidth: 1,
-      opacity: 0.8,
+      opacity: 1,
     },
     'in-progress': {
-      backgroundColor: 'var(--timeline-task-in-progress-bg, var(--timeline-task-bg, var(--u-info-color, #3B82F6)))',
-      borderColor: 'var(--timeline-task-in-progress-border, var(--timeline-task-border, var(--u-info-color-strong, #2563EB)))',
-      textColor: 'var(--timeline-task-in-progress-text, var(--timeline-task-text, #FFFFFF))',
+      backgroundColor: 'var(--timeline-task-in-progress-bg, var(--timeline-task-bg, var(--u-info-color, #1976D2)))',
+      borderColor: 'var(--timeline-task-in-progress-border, var(--timeline-task-border, var(--u-info-color-strong, #1565C0)))',
+      textColor: 'var(--timeline-task-in-progress-text, var(--timeline-task-text, var(--u-info-txt-color, #FFFFFF)))',
       borderWidth: 1,
       opacity: 1,
     },
     completed: {
-      backgroundColor: 'var(--timeline-task-completed-bg, var(--u-success-color, #10B981))',
-      borderColor: 'var(--timeline-task-completed-border, var(--u-success-color-strong, #059669))',
-      textColor: 'var(--timeline-task-completed-text, var(--timeline-task-text, #FFFFFF))',
+      backgroundColor: 'var(--timeline-task-completed-bg, var(--u-success-color, #2E7D32))',
+      borderColor: 'var(--timeline-task-completed-border, var(--u-success-color-strong, #1B5E20))',
+      textColor: 'var(--timeline-task-completed-text, var(--timeline-task-text, var(--u-success-txt-color, #FFFFFF)))',
       borderWidth: 1,
       opacity: 1,
     },
     cancelled: {
-      backgroundColor: 'var(--timeline-task-cancelled-bg, var(--u-danger-color, #EF4444))',
-      borderColor: 'var(--timeline-task-cancelled-border, var(--u-danger-color-strong, #DC2626))',
-      textColor: 'var(--timeline-task-cancelled-text, var(--timeline-task-text, #FFFFFF))',
+      backgroundColor: 'var(--timeline-task-cancelled-bg, var(--u-danger-color, #D32F2F))',
+      borderColor: 'var(--timeline-task-cancelled-border, var(--u-danger-color-strong, #C62828))',
+      textColor: 'var(--timeline-task-cancelled-text, var(--timeline-task-text, var(--u-danger-txt-color, #FFFFFF)))',
       borderWidth: 1,
-      opacity: 0.6,
+      opacity: 1,
     },
   },
   selected: {
-    borderColor: 'var(--timeline-task-selected-border, var(--u-info-color-strong, #1D4ED8))',
+    borderColor: 'var(--timeline-task-selected-border, var(--u-info-color-strong, #1565C0))',
     borderWidth: 2,
   },
   hovered: {
-    opacity: 0.9,
+    borderWidth: 2,
   },
   dragging: {
     opacity: 0.7,
@@ -138,7 +140,7 @@ export const DEFAULT_STYLE_CONFIG: TaskStyleConfig = {
   resizeHandleWidth: 6,
   resizeHandleColor: 'rgba(255, 255, 255, 0.4)',
   baseline: {
-    borderColor: 'var(--timeline-task-baseline, var(--u-neutral-500, #6B7280))',
+    borderColor: 'var(--timeline-task-baseline, var(--u-neutral-600, #757575))',
     borderWidth: 1.5,
   },
 };

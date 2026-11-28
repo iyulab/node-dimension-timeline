@@ -83,10 +83,10 @@ const near = (actual: number[], expected: number[], tolerance = 8) => {
 };
 
 describe('캔버스 색 — 손잡이 → 토큰 → 지금 색', () => {
-  it('NEGATIVE: 아무것도 걸지 않으면 지금 색이다(흰 바탕 · 완료 막대 초록)', async () => {
+  it('NEGATIVE: 아무것도 걸지 않으면 기본 색이다(components 라이트 값 — 옅은 회색 바탕 · 완료 막대 초록)', async () => {
     const el = await mount();
-    near(background(el), [255, 255, 255]);
-    near(bar(el), [16, 185, 129]);
+    near(background(el), [245, 245, 245], 3);
+    near(bar(el), [46, 125, 50]);
   });
 
   it('🔴손잡이가 바탕과 상태 막대를 바꾼다', async () => {
@@ -111,7 +111,7 @@ describe('캔버스 색 — 손잡이 → 토큰 → 지금 색', () => {
 
   it('🔴테마 토큰이 바뀌면(문서 루트의 style) 다시 풀어 다시 그린다', async () => {
     const el = await mount();
-    near(background(el), [255, 255, 255]);
+    near(background(el), [245, 245, 245], 3);
     root.style.setProperty('--u-canvas-bg-color', 'rgb(20, 20, 24)');
     await frame();
     await frame();

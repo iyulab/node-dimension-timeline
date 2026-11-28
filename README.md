@@ -225,10 +225,13 @@ Context 내부에서 Task를 배치하는 핵심 엔진입니다.
 | `--timeline-row-alt` · `--timeline-row-selected` | | 짝수 줄 · 고른 작업의 줄 |
 | `--timeline-context-divider` | `--u-border-color` | 맥락 사이 구분선 |
 | `--timeline-selection-line` | `--u-danger-color` | 선택 선 |
-| `--timeline-task-bg` · `-border` · `-text` | `--u-info-color` · `--u-info-color-strong` | 기본 · 진행 중 막대 |
-| `--timeline-task-pending-*` · `--timeline-task-completed-*` · `--timeline-task-cancelled-*` (`-bg` `-border` `-text`) | `--u-neutral-500/600` · `--u-success-color[-strong]` · `--u-danger-color[-strong]` | 상태별 막대 |
+| `--timeline-task-bg` · `-border` · `-text` | `--u-info-color` · `--u-info-color-strong` · `--u-info-txt-color` | 기본 · 진행 중 막대 |
+| `--timeline-task-pending-*` · `--timeline-task-completed-*` · `--timeline-task-cancelled-*` (`-bg` `-border` `-text`) | `--u-neutral-600/700` · `--u-success-color[-strong]` + `--u-success-txt-color` · `--u-danger-color[-strong]` + `--u-danger-txt-color` | 상태별 막대 |
 | `--timeline-task-selected-border` | `--u-info-color-strong` | 고른 막대의 테두리 |
-| `--timeline-task-baseline` | `--u-neutral-500` | 기준 구간(`task.baseline`) 윤곽 |
+| `--timeline-task-baseline` | `--u-neutral-600` | 기준 구간(`task.baseline`) 윤곽 |
+
+막대의 상태는 색으로만 가르고 흐리게(불투명도) 하지 않는다 — 흐린 채움 위의 글자는 읽히지 않는다. 호버한 막대는 테두리가 굵어진다. 끄는 중인 막대만 밑이 비치도록 반투명하게 그린다.
+`--timeline-task-*-bg` 를 바꾸면 그 위 글자가 4.5:1 이상으로 읽히는 `--timeline-task-*-text` 를 함께 준다.
 
 작업의 `color` 와 템플릿 설정(`TaskStyleConfig`)에도 `var(--u-danger-color)` 같은 색 표현을 쓸 수 있다.
 
