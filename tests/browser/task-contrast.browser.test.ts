@@ -1,6 +1,6 @@
 /// <reference types="@vitest/browser-playwright" />
 import { describe, it, expect, afterEach } from 'vitest';
-import darkSheet from '@iyulab/components/dist/assets/styles/dark.css?raw';
+import darkSheet from '@iyulab/components/styles/dark.css?raw';
 import '../../src/components/DimensionTimeline.js';
 import { ArrayDataSource } from '../../src/data/ArrayDataSource.js';
 import type { TaskStatus } from '../../src/types/index.js';
