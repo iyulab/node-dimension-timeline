@@ -60,7 +60,7 @@ jobs:
             const s = p.scripts || {};
             const d = { ...p.devDependencies, ...p.dependencies };
             // ⚠'@playwright/test' 를 빠뜨리면 e2e 를 가진 패키지가 **크로미움 없이** 돈다.
-            //   실측(cycle-495): 이 이름만 갖고 있어 browser=false 인 패키지가 있었다.
+            //   실측: 이 이름만 갖고 있어 browser=false 인 패키지가 있었다.
             const browser = ('@vitest/browser-playwright' in d) || ('playwright' in d) || ('@playwright/test' in d);
             const fs = require('fs');
             const out = [
@@ -105,7 +105,7 @@ jobs:
         run: npm test
 
       # ★`test:e2e` 는 `npm test` 와 **다른 명령**이라 여기 걸지 않으면 어디서도 돌지 않는다.
-      #   실측(cycle-495): 한 패키지의 WCAG 타깃 크기 게이트가 정확히 그 상태였다 —
+      #   실측: 한 패키지의 WCAG 타깃 크기 게이트가 정확히 그 상태였다 —
       #   사람이 손으로 `npm run test:e2e` 를 칠 때만 도는 «불변식이 아니라 문장»이었다.
       #   ⚠`npm test` 에 합치지 않는 이유: 크로미움이 없는 로컬이 전부 빨개진다. 검증이
       #   도는 자리는 CI 이고, 로컬 개발 루프는 vitest 로 빠르게 유지한다.
